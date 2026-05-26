@@ -1,35 +1,15 @@
 'use client'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import AGMRLogo from '@/components/ui/AGMRLogo'
 import Icon from '@/components/ui/Icon'
-import { gymCourses, randoSorties, news, sejours, bureau, animators } from '@/data'
+import { createClient } from '@/lib/supabase-client'
+import { gymCourses, randoSorties, news, sejours, bureau } from '@/data'
 import { formatDateFR, labelType, catLabel } from '@/utils/format'
 
-// ── Login ─────────────────────────────────────────────────────
-function AdminLogin({ onLogin }) {
-  const [pwd, setPwd] = useState("")
-  return (
-    <div className="login-shell">
-      <div className="login-card">
-        <AGMRLogo size={52}/>
-        <div style={{ fontSize: "0.74rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--ink-mute)", marginBottom: 6, fontWeight: 600, marginTop: 24 }}>Back-office</div>
-        <h2 style={{ fontSize: "1.8rem", marginBottom: 8 }}>Connexion administrateur</h2>
-        <p style={{ color: "var(--ink-mute)", marginBottom: 24, fontSize: "0.96rem" }}>Espace réservé aux administrateurs.</p>
-        <div className="form">
-          <div className="field"><label>Email</label><input defaultValue="admin@agmr.fr"/></div>
-          <div className="field"><label>Mot de passe</label><input type="password" value={pwd} onChange={e => setPwd(e.target.value)} placeholder="(démo : n'importe quoi)"/></div>
-          <button className="btn btn-primary" onClick={onLogin} style={{ marginTop: 8 }}>
-            <Icon name="lock" size={15}/> Se connecter
-          </button>
-          <p style={{ fontSize: "0.82rem", color: "var(--ink-mute)", textAlign: "center", margin: 0 }}>Prototype — aucune vérification</p>
-        </div>
-      </div>
-    </div>
-  )
-}
-
 // ── Sidebar ───────────────────────────────────────────────────
-function AdminSidebar({ section, setSection, onLogout }) {
+function AdminSidebar({ section, setSection, user }) {
+  const router = useRouter()
   const items = [
     { id: "dash", label: "Tableau de bord", icon: "home" },
     { id: "gym", label: "Planning Gym", icon: "calendar" },
@@ -41,6 +21,14 @@ function AdminSidebar({ section, setSection, onLogout }) {
     { id: "tarifs", label: "Tarifs", icon: "file" },
     { id: "settings", label: "Paramètres", icon: "settings" },
   ]
+
+  const handleLogout = async () => {
+    const supabase = createClient()
+    await supabase.auth.signOut()
+    router.push('/admin/login')
+    router.refresh()
+  }
+
   return (
     <aside className="admin-side">
       <div className="admin-side-brand">
@@ -58,8 +46,18 @@ function AdminSidebar({ section, setSection, onLogout }) {
         ))}
       </nav>
       <div className="admin-side-foot">
-        <div style={{ marginBottom: 8 }}>Connecté en tant que<br/><strong style={{ color: "#fff" }}>admin@agmr.fr</strong></div>
-        <a href="/" style={{ display: "flex", alignItems: "center", gap: 8 }}><Icon name="logout" size={14}/> Retour au site</a>
+        <div style={{ marginBottom: 8 }}>
+          Connecté en tant que<br/>
+          <strong style={{ color: "#fff" }}>{user?.email}</strong>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <a href="/" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <Icon name="home" size={14}/> Retour au site
+          </a>
+          <button onClick={handleLogout} style={{ background: "none", border: "none", color: "#8b9089", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, padding: 0, fontFamily: "inherit", fontSize: "0.82rem" }}>
+            <Icon name="logout" size={14}/> Se déconnecter
+          </button>
+        </div>
       </div>
     </aside>
   )
@@ -456,27 +454,27 @@ function AdminTarifs() {
 }
 
 // ── Admin Paramètres ──────────────────────────────────────────
-function AdminSettings() {
+function AdminSettings({ user }) {
   return (
     <>
       <div className="admin-head"><h1>Paramètres</h1></div>
       <div style={{ background: "var(--bg-card)", border: "1px solid var(--line)", borderRadius: "var(--r-md)", padding: 28, maxWidth: 640 }}>
         <h3 style={{ marginBottom: 16, fontFamily: "var(--sans)", fontSize: "1.1rem", fontWeight: 700 }}>Compte administrateur</h3>
         <div className="form">
-          <div className="field"><label>Email</label><input defaultValue="admin@agmr.fr" readOnly/></div>
+          <div className="field"><label>Email</label><input defaultValue={user?.email} readOnly/></div>
           <div className="field"><label>Mot de passe</label><input type="password" defaultValue="••••••••" readOnly/></div>
           <button className="btn btn-ghost" style={{ alignSelf: "flex-start" }}>Modifier le mot de passe</button>
         </div>
         <hr style={{ border: "none", borderTop: "1px solid var(--line)", margin: "28px 0" }}/>
         <h3 style={{ marginBottom: 12, fontFamily: "var(--sans)", fontSize: "1.1rem", fontWeight: 700 }}>État du projet</h3>
         <div style={{ fontSize: "0.9rem", color: "var(--ink-soft)", lineHeight: 2, padding: "16px 20px", background: "var(--bg)", borderRadius: "var(--r-sm)", border: "1px dashed var(--line-strong)" }}>
-          <div>✅ Phase 1 — Pages publiques terminées</div>
-          <div>✅ Phase 2 — Backoffice (prototype in-memory)</div>
-          <div>⏳ Phase 3 — Supabase base de données</div>
-          <div>⏳ Phase 4 — Auth & rôles admin</div>
+          <div>✅ Phase 1 — Pages publiques</div>
+          <div>✅ Phase 2 — Backoffice</div>
+          <div>✅ Phase 3 — Supabase (lecture)</div>
+          <div>✅ Phase 4 — Auth Supabase</div>
           <div>⏳ Phase 5 — CRUD branché Supabase</div>
           <div>⏳ Phase 6 — Storage photos</div>
-          <div>⏳ Phase 7 — Déploiement Vercel + GitHub</div>
+          <div>⏳ Phase 7 — Déploiement Vercel</div>
         </div>
       </div>
     </>
@@ -495,7 +493,7 @@ const ADMIN_CSS = `
 .admin-side nav a:hover { background: rgba(255,255,255,0.04); color: #fff; }
 .admin-side nav a.active { background: rgba(184,69,31,0.18); color: #fff; border-left-color: var(--accent); }
 .admin-side-foot { margin-top: auto; padding: 18px 24px; border-top: 1px solid #1f2a23; font-size: 0.82rem; color: #8b9089; }
-.admin-side-foot a { color: #8b9089; display: flex; align-items: center; gap: 8px; }
+.admin-side-foot a { color: #8b9089; display: flex; align-items: center; gap: 8px; text-decoration: none; }
 .admin-side-foot a:hover { color: #fff; }
 .admin-main { padding: 36px 44px; overflow-y: auto; }
 .admin-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; padding-bottom: 22px; border-bottom: 1px solid var(--line); }
@@ -517,17 +515,13 @@ const ADMIN_CSS = `
 `
 
 // ── App ───────────────────────────────────────────────────────
-export default function AdminApp() {
-  const [authed, setAuthed] = useState(false)
+export default function AdminApp({ user }) {
   const [section, setSection] = useState("dash")
-
-  if (!authed) return <AdminLogin onLogin={() => setAuthed(true)}/>
-
   return (
     <>
       <style>{ADMIN_CSS}</style>
       <div className="admin-shell">
-        <AdminSidebar section={section} setSection={setSection}/>
+        <AdminSidebar section={section} setSection={setSection} user={user}/>
         <div className="admin-main">
           {section === "dash"     && <Dashboard setSection={setSection}/>}
           {section === "gym"      && <AdminGym/>}
@@ -537,7 +531,7 @@ export default function AdminApp() {
           {section === "galerie"  && <AdminGalerie/>}
           {section === "comite"   && <AdminComite/>}
           {section === "tarifs"   && <AdminTarifs/>}
-          {section === "settings" && <AdminSettings/>}
+          {section === "settings" && <AdminSettings user={user}/>}
         </div>
       </div>
     </>

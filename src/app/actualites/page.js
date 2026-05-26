@@ -1,0 +1,25 @@
+import Header from '@/components/shell/Header'
+import Footer from '@/components/shell/Footer'
+import ActualitesClient from './ActualitesClient'
+
+export const metadata = { title: 'Actualités — AGMR' }
+
+export default function ActualitesPage() {
+  return (
+    <div className="page-shell">
+      <Header/>
+      <main className="page-main">
+        <div className="page-header">
+          <div className="container">
+            <div className="crumb">Accueil / Actualités</div>
+            <div className="page-header-eyebrow">Annonces & Informations</div>
+            <h1>Actualités</h1>
+            <p className="page-header-lede">Toutes les annonces en cours, classées par section.</p>
+          </div>
+        </div>
+        <ActualitesClient/>
+      </main>
+      <Footer/>
+    </div>
+  )
+}

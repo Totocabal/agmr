@@ -69,8 +69,8 @@ export default function Header() {
           <Link className="btn btn-ghost btn-sm" href="/espace-adherents">
             <Icon name="user" size={15}/> Adhérents
           </Link>
-          <Link className="btn btn-primary" href="/inscriptions">
-            S'inscrire
+          <Link className="btn btn-primary btn-sm" href="/inscriptions">
+            S&apos;inscrire
           </Link>
         </div>
       </div>

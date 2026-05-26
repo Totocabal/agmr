@@ -1,30 +1,23 @@
 'use client'
 import { useState } from 'react'
-import { news } from '@/data'
 import { formatDateFR, catLabel } from '@/utils/format'
 
 const CATS = ["all","gym","rando","nordique","asso","event"]
 
-export default function ActualitesClient() {
+export default function ActualitesClient({ articles }) {
   const [filter, setFilter] = useState("all")
-  const filtered = news.filter(n => filter === "all" || n.cat === filter)
+  const filtered = articles.filter(n => filter === "all" || n.cat === filter)
 
   return (
     <section className="section">
       <div className="container">
-
         <div style={{ display: "flex", gap: 8, marginBottom: 32, flexWrap: "wrap" }}>
           {CATS.map(c => (
-            <button
-              key={c}
-              className={`chip ${filter === c ? "active" : ""}`}
-              onClick={() => setFilter(c)}
-            >
+            <button key={c} className={`chip ${filter === c ? "active" : ""}`} onClick={() => setFilter(c)}>
               {c === "all" ? "Tout" : catLabel(c)}
             </button>
           ))}
         </div>
-
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 20 }}>
           {filtered.map(n => (
             <article key={n.id} style={{ background: "var(--bg-card)", border: "1px solid var(--line-soft)", borderRadius: "var(--r-md)", padding: 28 }}>
@@ -37,7 +30,6 @@ export default function ActualitesClient() {
             </article>
           ))}
         </div>
-
       </div>
     </section>
   )

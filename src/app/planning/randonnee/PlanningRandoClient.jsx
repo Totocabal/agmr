@@ -1,16 +1,16 @@
 'use client'
 import { useState } from 'react'
 import Icon from '@/components/ui/Icon'
-import { randoSorties } from '@/data'
 import { labelType } from '@/utils/format'
 
 const TYPES = ["all","rando-jeudi","rando-dimanche","nordique-mardi","nordique-samedi","sortie-journee","sejour"]
 const DOW = ["Dim","Lun","Mar","Mer","Jeu","Ven","Sam"]
 const MSHORT = ["jan","fév","mars","avr","mai","juin","juil","août","sept","oct","nov","déc"]
 
-export default function PlanningRandoClient() {
+export default function PlanningRandoClient({ sorties }) {
   const [filter, setFilter] = useState("all")
-  const filtered = randoSorties
+
+  const filtered = sorties
     .filter(s => filter === "all" || s.type === filter)
     .sort((a, b) => a.date.localeCompare(b.date))
 

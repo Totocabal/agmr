@@ -1,10 +1,12 @@
 import Header from '@/components/shell/Header'
 import Footer from '@/components/shell/Footer'
 import PlanningRandoClient from './PlanningRandoClient'
+import { getRandoSorties } from '@/lib/queries'
 
 export const metadata = { title: 'Planning Rando & Nordique — AGMR' }
 
-export default function PlanningRandoPage() {
+export default async function PlanningRandoPage() {
+  const sorties = await getRandoSorties()
   return (
     <div className="page-shell">
       <Header/>
@@ -14,10 +16,10 @@ export default function PlanningRandoPage() {
             <div className="crumb">Accueil / Planning / Rando & Nordique</div>
             <div className="page-header-eyebrow">Planning · Saison 2025-2026</div>
             <h1>Planning Rando & Nordique</h1>
-            <p className="page-header-lede">Calendrier des sorties randonnée (jeudi et dimanche) et des séances de marche nordique (mardi et samedi).</p>
+            <p className="page-header-lede">Calendrier des sorties randonnée et des séances de marche nordique.</p>
           </div>
         </div>
-        <PlanningRandoClient/>
+        <PlanningRandoClient sorties={sorties}/>
       </main>
       <Footer/>
     </div>

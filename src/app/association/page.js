@@ -2,11 +2,12 @@ import Link from 'next/link'
 import Header from '@/components/shell/Header'
 import Footer from '@/components/shell/Footer'
 import Icon from '@/components/ui/Icon'
-import { bureau } from '@/data'
+import { getBureau } from '@/lib/queries'
 
 export const metadata = { title: "L'Association — AGMR" }
 
-export default function AssoPage() {
+export default async function AssoPage() {
+  const bureau = await getBureau()
   return (
     <div className="page-shell">
       <Header/>
@@ -37,7 +38,7 @@ export default function AssoPage() {
               <div>
                 <h2 id="histoire" style={{ fontSize: "1.8rem", marginBottom: 16 }}>Notre histoire</h2>
                 <p style={{ color: "var(--ink-soft)" }}>
-                  L'Association Gym Marche Rambouillet (AGMR) est le nouveau nom du <strong>Club Loisirs et Détente (CLD)</strong>. C'est une association selon la loi de 1901, créée en <strong>1970</strong>. Le changement de nom a été voté lors de l'assemblée générale extraordinaire de novembre 2018, pour mieux refléter les activités de l'association.
+                  L'Association Gym Marche Rambouillet (AGMR) est le nouveau nom du <strong>Club Loisirs et Détente (CLD)</strong>. C'est une association selon la loi de 1901, créée en <strong>1970</strong>. Le changement de nom a été voté lors de l'assemblée générale extraordinaire de novembre 2018.
                 </p>
                 <div style={{ margin: "20px 0", padding: "20px 24px", borderLeft: "3px solid var(--accent)", background: "var(--accent-tint)", borderRadius: "0 var(--r-sm) var(--r-sm) 0" }}>
                   <p style={{ fontFamily: "var(--serif)", fontStyle: "italic", fontSize: "1.15rem", color: "var(--accent-deep)", margin: 0 }}>
@@ -64,19 +65,14 @@ export default function AssoPage() {
 
                 <h2 id="gouvernance" style={{ fontSize: "1.8rem", marginTop: 48, marginBottom: 8 }}>Gouvernance</h2>
                 <p style={{ color: "var(--ink-soft)", marginBottom: 20 }}>
-                  L'association est dirigée par un <strong>comité directeur</strong> élu en assemblée générale. Il se réunit 2 fois par trimestre. Les membres du bureau administrent la marche du club.
+                  L'association est dirigée par un <strong>comité directeur</strong> élu en assemblée générale. Il se réunit 2 fois par trimestre.
                 </p>
                 <h3 style={{ fontFamily: "var(--sans)", fontSize: "1rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--ink-mute)", marginBottom: 12 }}>Comité directeur 2025-2026</h3>
                 <table className="tbl" style={{ marginBottom: 16 }}>
-                  <thead>
-                    <tr><th>Membre</th><th>Rôle</th></tr>
-                  </thead>
+                  <thead><tr><th>Membre</th><th>Rôle</th></tr></thead>
                   <tbody>
                     {bureau.map((b, i) => (
-                      <tr key={i}>
-                        <td><strong>{b.nom}</strong></td>
-                        <td>{b.role}</td>
-                      </tr>
+                      <tr key={i}><td><strong>{b.nom}</strong></td><td>{b.role}</td></tr>
                     ))}
                   </tbody>
                 </table>
@@ -85,7 +81,7 @@ export default function AssoPage() {
                 </Link>
 
                 <h2 id="affiliations" style={{ fontSize: "1.8rem", marginTop: 48, marginBottom: 16 }}>Affiliations & labels</h2>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 8 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
                   {[
                     ["FFEPGV","Qualité Club Sport Santé","Label fédéral attestant de la qualité de l'encadrement et du projet club."],
                     ["FFR","Label Rando-Santé","Encadrement formé pour les pratiquants nécessitant une marche adaptée."],
@@ -118,7 +114,6 @@ export default function AssoPage() {
                     </a>
                   ))}
                 </div>
-
               </div>
             </div>
           </div>

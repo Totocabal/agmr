@@ -1,10 +1,12 @@
 import Header from '@/components/shell/Header'
 import Footer from '@/components/shell/Footer'
 import PlanningGymClient from './PlanningGymClient'
+import { getGymCourses } from '@/lib/queries'
 
 export const metadata = { title: 'Planning Gym — AGMR' }
 
-export default function PlanningGymPage() {
+export default async function PlanningGymPage() {
+  const courses = await getGymCourses()
   return (
     <div className="page-shell">
       <Header/>
@@ -17,7 +19,7 @@ export default function PlanningGymPage() {
             <p className="page-header-lede">43 heures de cours par semaine dans 5 salles. Pas de cours pendant les vacances scolaires.</p>
           </div>
         </div>
-        <PlanningGymClient/>
+        <PlanningGymClient courses={courses}/>
       </main>
       <Footer/>
     </div>

@@ -1,10 +1,12 @@
 import Header from '@/components/shell/Header'
 import Footer from '@/components/shell/Footer'
 import ActualitesClient from './ActualitesClient'
+import { getActualites } from '@/lib/queries'
 
 export const metadata = { title: 'Actualités — AGMR' }
 
-export default function ActualitesPage() {
+export default async function ActualitesPage() {
+  const articles = await getActualites()
   return (
     <div className="page-shell">
       <Header/>
@@ -17,7 +19,7 @@ export default function ActualitesPage() {
             <p className="page-header-lede">Toutes les annonces en cours, classées par section.</p>
           </div>
         </div>
-        <ActualitesClient/>
+        <ActualitesClient articles={articles}/>
       </main>
       <Footer/>
     </div>

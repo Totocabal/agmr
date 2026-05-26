@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import Header from '@/components/shell/Header'
 import Footer from '@/components/shell/Footer'
-import { sejours } from '@/data'
+import { getSejours } from '@/lib/queries'
 
 export const metadata = { title: 'Séjours & Sorties — AGMR' }
 
@@ -16,7 +16,8 @@ const SORTIES_JOURNEE = [
   { date: "05 juillet 2026", sortie: "Forêt de Fontainebleau — circuit des Trois Pignons", transport: "Covoiturage" },
 ]
 
-export default function SejoursPage() {
+export default async function SejoursPage() {
+  const sejours = await getSejours()
   return (
     <div className="page-shell">
       <Header/>
@@ -32,7 +33,6 @@ export default function SejoursPage() {
 
         <section className="section">
           <div className="container">
-
             <h2 style={{ fontFamily: "var(--serif)", fontSize: "2rem", marginBottom: 28 }}>Saison 2025-2026</h2>
             <div style={{ display: "flex", flexDirection: "column", gap: 20, marginBottom: 64 }}>
               {sejours.map(s => (
@@ -63,14 +63,9 @@ export default function SejoursPage() {
 
             <h2 style={{ fontFamily: "var(--serif)", fontSize: "2rem", marginBottom: 8 }}>Sorties à la journée</h2>
             <p style={{ color: "var(--ink-mute)", fontSize: "0.94rem", marginBottom: 20 }}>À thème, plusieurs fois par trimestre. En train, en car ou en covoiturage.</p>
-            <table className="tbl" style={{ marginBottom: 64 }}>
+            <table className="tbl">
               <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Sortie</th>
-                  <th>Transport</th>
-                  <th></th>
-                </tr>
+                <tr><th>Date</th><th>Sortie</th><th>Transport</th><th></th></tr>
               </thead>
               <tbody>
                 {SORTIES_JOURNEE.map((s, i) => (
@@ -85,9 +80,6 @@ export default function SejoursPage() {
                 ))}
               </tbody>
             </table>
-
-            
-
           </div>
         </section>
       </main>

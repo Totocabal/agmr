@@ -2,12 +2,11 @@
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import Icon from '@/components/ui/Icon'
-import { gymCourses } from '@/data'
 import { monthFR, monthFRFull } from '@/utils/format'
 
 const DAYS = ["lundi","mardi","mercredi","jeudi","vendredi","samedi"]
 
-export default function PlanningGymClient() {
+export default function PlanningGymClient({ courses }) {
   const [weekOffset, setWeekOffset] = useState(0)
 
   const monday = useMemo(() => {
@@ -25,12 +24,9 @@ export default function PlanningGymClient() {
     return `${monday.getDate()} ${monthFRFull(monday.getMonth())} — ${end.getDate()} ${monthFRFull(end.getMonth())} ${end.getFullYear()}`
   }, [monday])
 
-  const courses = gymCourses.filter(c => c.actif)
-
   return (
     <section className="section">
       <div className="container">
-
         <div className="planning-toolbar">
           <div className="week-nav">
             <button className="icon-btn" onClick={() => setWeekOffset(weekOffset - 1)}>
@@ -98,17 +94,10 @@ export default function PlanningGymClient() {
             <h4 style={{ marginBottom: 10 }}>Rappel</h4>
             <p style={{ margin: 0, fontSize: "0.94rem", color: "var(--ink-soft)" }}>
               Il n'y a <strong>pas de cours pendant les vacances scolaires</strong>.
-              Des stages spécifiques sont régulièrement organisés — consulter la page Actualités.
+              Des stages spécifiques sont régulièrement organisés.
             </p>
           </div>
         </div>
-
-        <div style={{ marginTop: 32, display: "flex", gap: 12 }}>
-          <Link className="btn btn-ghost btn-sm" href="#">
-            <Icon name="download" size={14}/> Planning complet (PDF)
-          </Link>
-        </div>
-
       </div>
     </section>
   )

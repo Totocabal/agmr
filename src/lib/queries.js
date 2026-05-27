@@ -18,6 +18,8 @@ export async function getGymCourses() {
     niveau: c.niveau,
     actif: c.actif,
     disc: c.disc,
+    complet: c.complet ?? false,
+    tag: c.tag ?? null,
   }))
 }
 

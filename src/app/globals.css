@@ -1031,6 +1031,8 @@ img { max-width: 100%; display: block; }
 .gym-slot.canceled { opacity: 0.55; }
 .gym-slot.canceled .gym-slot-disc { text-decoration: line-through; }
 .gym-slot.complet { opacity: 0.7; }
+/* In time-grid view, suppress horizontal translateX on hover */
+.planning-time-grid .gym-slot:hover { transform: none; }
 .slot-badge {
   display: inline-block;
   margin-left: 6px;

@@ -6,8 +6,41 @@ import { monthFR, monthFRFull } from '@/utils/format'
 
 const DAYS = ["lundi","mardi","mercredi","jeudi","vendredi","samedi"]
 
+function exportPDF(courses, weekLabel) {
+  const byDay = DAYS.map(day => ({
+    day,
+    slots: courses.filter(c => c.jour === day).sort((a, b) => a.heureDebut.localeCompare(b.heureDebut)),
+  }))
+  const rows = byDay.flatMap(({ day, slots }) =>
+    slots.map(s => `<tr><td class="cap">${day}</td><td>${s.heureDebut} – ${s.heureFin}</td><td>${s.discipline}</td><td>${s.animateur}</td><td>${s.salle}</td></tr>`)
+  ).join('')
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Planning Gym — AGMR</title>
+<style>
+  body{font-family:Georgia,serif;padding:32px;color:#1a1a1a}
+  h1{font-size:1.5rem;margin:0 0 4px}
+  .sub{font-family:Arial,sans-serif;font-size:0.78rem;color:#666;margin-bottom:24px}
+  table{width:100%;border-collapse:collapse}
+  th{background:#1e3528;color:#fff;padding:9px 14px;text-align:left;font-family:Arial,sans-serif;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em}
+  td{padding:9px 14px;border-bottom:1px solid #e8e4dc;font-size:0.88rem}
+  tr:nth-child(even) td{background:#f9f7f3}
+  .cap{text-transform:capitalize}
+</style></head><body>
+<h1>Planning Gym — AGMR</h1>
+<div class="sub">Semaine du ${weekLabel} · Exporté le ${new Date().toLocaleDateString('fr-FR')}</div>
+<table>
+<thead><tr><th>Jour</th><th>Horaire</th><th>Discipline</th><th>Animateur</th><th>Salle</th></tr></thead>
+<tbody>${rows}</tbody>
+</table>
+</body></html>`
+  const w = window.open('', '_blank', 'width=920,height=680')
+  w.document.write(html)
+  w.document.close()
+  w.print()
+}
+
 export default function PlanningGymClient({ courses }) {
   const [weekOffset, setWeekOffset] = useState(0)
+  const [discFilter, setDiscFilter] = useState("all")
 
   const monday = useMemo(() => {
     const d = new Date()
@@ -23,6 +56,12 @@ export default function PlanningGymClient({ courses }) {
     end.setDate(end.getDate() + 5)
     return `${monday.getDate()} ${monthFRFull(monday.getMonth())} — ${end.getDate()} ${monthFRFull(end.getMonth())} ${end.getFullYear()}`
   }, [monday])
+
+  const disciplines = useMemo(() =>
+    [...new Set(courses.map(c => c.discipline))].sort()
+  , [courses])
+
+  const visibleCourses = discFilter === "all" ? courses : courses.filter(c => c.discipline === discFilter)
 
   return (
     <section className="section">
@@ -42,16 +81,23 @@ export default function PlanningGymClient({ courses }) {
               Aujourd'hui
             </button>
           )}
-          <button className="btn btn-ghost btn-sm">
+          <button className="btn btn-ghost btn-sm" onClick={() => exportPDF(visibleCourses, weekLabel)}>
             <Icon name="download" size={14}/> PDF
           </button>
+        </div>
+
+        <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
+          <button className={`chip ${discFilter === "all" ? "active" : ""}`} onClick={() => setDiscFilter("all")}>Toutes</button>
+          {disciplines.map(d => (
+            <button key={d} className={`chip ${discFilter === d ? "active" : ""}`} onClick={() => setDiscFilter(d)}>{d}</button>
+          ))}
         </div>
 
         <div className="gym-grid">
           {DAYS.map((day, di) => {
             const date = new Date(monday)
             date.setDate(date.getDate() + di)
-            const slots = courses
+            const slots = visibleCourses
               .filter(c => c.jour === day)
               .sort((a, b) => a.heureDebut.localeCompare(b.heureDebut))
             return (

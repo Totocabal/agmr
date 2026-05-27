@@ -20,11 +20,40 @@ function Modal({ title, onClose, children }) {
   )
 }
 
+function exportPDF(courses) {
+  const rows = courses.map(c =>
+    `<tr><td class="cap">${c.jour}</td><td>${c.heureDebut} – ${c.heureFin}</td><td>${c.discipline}</td><td>${c.animateur}</td><td>${c.salle}</td></tr>`
+  ).join('')
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Planning Gym — AGMR</title>
+<style>
+  body{font-family:Georgia,serif;padding:32px;color:#1a1a1a}
+  h1{font-size:1.5rem;margin:0 0 4px}
+  .sub{font-family:Arial,sans-serif;font-size:0.78rem;color:#666;margin-bottom:24px}
+  table{width:100%;border-collapse:collapse}
+  th{background:#1e3528;color:#fff;padding:9px 14px;text-align:left;font-family:Arial,sans-serif;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em}
+  td{padding:9px 14px;border-bottom:1px solid #e8e4dc;font-size:0.88rem}
+  tr:nth-child(even) td{background:#f9f7f3}
+  .cap{text-transform:capitalize}
+</style></head><body>
+<h1>Planning Gym — AGMR</h1>
+<div class="sub">Exporté le ${new Date().toLocaleDateString('fr-FR')} · ${courses.length} créneaux</div>
+<table>
+<thead><tr><th>Jour</th><th>Horaire</th><th>Discipline</th><th>Animateur</th><th>Salle</th></tr></thead>
+<tbody>${rows}</tbody>
+</table>
+</body></html>`
+  const w = window.open('', '_blank', 'width=920,height=680')
+  w.document.write(html)
+  w.document.close()
+  w.print()
+}
+
 export default function AdminGymSection() {
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState(null)
   const [fd, setFd] = useState("all")
+  const [fdDisc, setFdDisc] = useState("all")
   const supabase = createClient()
 
   const fetchCourses = async () => {
@@ -83,7 +112,12 @@ export default function AdminGymSection() {
     fetchCourses()
   }
 
-  const filtered = items.filter(i => fd === "all" || i.jour === fd)
+  const disciplines = [...new Set(items.map(i => i.discipline))].sort()
+
+  const filtered = items
+    .filter(i => fd === "all" || i.jour === fd)
+    .filter(i => fdDisc === "all" || i.discipline === fdDisc)
+
   const blank = { jour: "lundi", heureDebut: "09:00", heureFin: "10:00", discipline: "", animateur: "", salle: "", niveau: "tous", actif: true, disc: "pilates" }
 
   if (loading) return <div style={{ padding: 40, color: "var(--ink-mute)" }}>Chargement...</div>
@@ -95,14 +129,26 @@ export default function AdminGymSection() {
           <h1>Planning Gym</h1>
           <p className="muted" style={{ margin: 0 }}>{items.length} créneaux · {items.filter(i => i.actif).length} actifs — <strong style={{ color: "var(--green)" }}>données Supabase</strong></p>
         </div>
-        <button className="btn btn-primary" onClick={() => setEditing(blank)}>
-          <Icon name="plus" size={16}/> Ajouter un créneau
-        </button>
+        <div style={{ display: "flex", gap: 8 }}>
+          <button className="btn btn-ghost" onClick={() => exportPDF(filtered)}>
+            <Icon name="download" size={14}/> Exporter PDF
+          </button>
+          <button className="btn btn-primary" onClick={() => setEditing(blank)}>
+            <Icon name="plus" size={16}/> Ajouter un créneau
+          </button>
+        </div>
+      </div>
+
+      <div style={{ display: "flex", gap: 8, marginBottom: 10, flexWrap: "wrap" }}>
+        <button className={`chip ${fd === "all" ? "active" : ""}`} onClick={() => setFd("all")}>Tous les jours</button>
+        {DAYS.map(d => <button key={d} className={`chip ${fd === d ? "active" : ""}`} onClick={() => setFd(d)} style={{ textTransform: "capitalize" }}>{d}</button>)}
       </div>
 
       <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
-        <button className={`chip ${fd === "all" ? "active" : ""}`} onClick={() => setFd("all")}>Tous</button>
-        {DAYS.map(d => <button key={d} className={`chip ${fd === d ? "active" : ""}`} onClick={() => setFd(d)} style={{ textTransform: "capitalize" }}>{d}</button>)}
+        <button className={`chip ${fdDisc === "all" ? "active" : ""}`} onClick={() => setFdDisc("all")}>Toutes les disciplines</button>
+        {disciplines.map(d => (
+          <button key={d} className={`chip ${fdDisc === d ? "active" : ""}`} onClick={() => setFdDisc(d)}>{d}</button>
+        ))}
       </div>
 
       <table className="tbl">
@@ -122,6 +168,9 @@ export default function AdminGymSection() {
               </td>
             </tr>
           ))}
+          {filtered.length === 0 && (
+            <tr><td colSpan={7} style={{ textAlign: "center", color: "var(--ink-mute)", padding: 32 }}>Aucun créneau pour cette sélection</td></tr>
+          )}
         </tbody>
       </table>
 

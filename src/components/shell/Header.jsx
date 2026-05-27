@@ -79,9 +79,6 @@ export default function Header() {
           ))}
         </nav>
         <div className="header-actions">
-          <Link className="btn btn-ghost btn-sm" href="/espace-adherents">
-            <Icon name="user" size={15}/> Adhérents
-          </Link>
           <Link className="btn btn-primary btn-sm" href="/inscriptions">
             S&apos;inscrire
           </Link>
@@ -168,9 +165,6 @@ export default function Header() {
         </nav>
 
         <div className="mobile-menu-actions">
-          <Link className="btn btn-ghost" href="/espace-adherents" onClick={() => setMenuOpen(false)}>
-            <Icon name="user" size={16}/> Espace adhérents
-          </Link>
           <Link className="btn btn-primary" href="/inscriptions" onClick={() => setMenuOpen(false)}>
             S&apos;inscrire
           </Link>

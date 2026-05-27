@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic'
 import Header from '@/components/shell/Header'
 import Footer from '@/components/shell/Footer'
 import ActualitesClient from './ActualitesClient'

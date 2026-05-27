@@ -18,18 +18,22 @@ import AdminRandoPageSection from './sections/AdminRandoPageSection'
 function AdminSidebar({ section, setSection, user }) {
   const router = useRouter()
   const items = [
-    { id: "dash", label: "Tableau de bord", icon: "home" },
-    { id: "gym", label: "Planning Gym", icon: "calendar" },
-    { id: "rando", label: "Planning Rando", icon: "mountain" },
-    { id: "sejours", label: "Séjours", icon: "pin" },
-    { id: "actu", label: "Actualités", icon: "file" },
-    { id: "galerie", label: "Galerie", icon: "image" },
-    { id: "home", label: "Page principale", icon: "home" },
+    { id: "dash",       label: "Tableau de bord",   icon: "home" },
+    { divider: "Activités" },
+    { id: "home",       label: "Page principale",   icon: "file" },
     { id: "gym-page",   label: "Page Gym",          icon: "leaf" },
+    { id: "gym",        label: "Planning Gym",      icon: "calendar" },
     { id: "rando-page", label: "Page Randonnée",    icon: "mountain" },
-    { id: "comite", label: "Comité directeur", icon: "user" },
-    { id: "tarifs", label: "Tarifs", icon: "file" },
-    { id: "settings", label: "Paramètres", icon: "settings" },
+    { id: "rando",      label: "Planning Rando",    icon: "mountain" },
+    { divider: "Contenus" },
+    { id: "sejours",    label: "Séjours",           icon: "pin" },
+    { id: "actu",       label: "Actualités",        icon: "file" },
+    { id: "galerie",    label: "Galerie",           icon: "image" },
+    { divider: "Association" },
+    { id: "comite",     label: "Comité directeur",  icon: "user" },
+    { id: "tarifs",     label: "Tarifs",            icon: "file" },
+    { divider: "" },
+    { id: "settings",   label: "Paramètres",        icon: "settings" },
   ]
 
   const handleLogout = async () => {
@@ -49,11 +53,22 @@ function AdminSidebar({ section, setSection, user }) {
         </div>
       </div>
       <nav>
-        {items.map(it => (
-          <a key={it.id} href="#" className={section === it.id ? "active" : ""} onClick={e => { e.preventDefault(); setSection(it.id) }}>
-            <Icon name={it.icon} size={16}/> {it.label}
-          </a>
-        ))}
+        {items.map((it, i) => {
+          if (it.divider !== undefined) {
+            return it.divider ? (
+              <div key={`div-${i}`} style={{ padding: "14px 24px 4px", fontSize: "0.65rem", letterSpacing: "0.18em", textTransform: "uppercase", color: "#4a5a4d", fontWeight: 700 }}>
+                {it.divider}
+              </div>
+            ) : (
+              <div key={`sep-${i}`} style={{ margin: "8px 20px", borderTop: "1px solid #1f2a23" }}/>
+            )
+          }
+          return (
+            <a key={it.id} href="#" className={section === it.id ? "active" : ""} onClick={e => { e.preventDefault(); setSection(it.id) }}>
+              <Icon name={it.icon} size={16}/> {it.label}
+            </a>
+          )
+        })}
       </nav>
       <div className="admin-side-foot">
         <div style={{ marginBottom: 8 }}>

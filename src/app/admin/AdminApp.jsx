@@ -18,14 +18,16 @@ import AdminSantePageSection from './sections/AdminSantePageSection'
 import AdminAssoPageSection from './sections/AdminAssoPageSection'
 import AdminComiteSection from './sections/AdminComiteSection'
 import AdminAGSection from './sections/AdminAGSection'
+import AdminAccessSection from './sections/AdminAccessSection'
 
 // ── Sidebar ───────────────────────────────────────────────────
-function AdminSidebar({ section, setSection, user }) {
+function AdminSidebar({ section, setSection, user, canAccess, isSuperAdmin }) {
   const router = useRouter()
-  const items = [
-    { id: "dash",       label: "Tableau de bord",   icon: "home" },
+
+  const allItems = [
+    { id: "dash",          label: "Tableau de bord",    icon: "home",          always: true },
     { divider: "Activités" },
-    { id: "home",       label: "Page principale",   icon: "file" },
+    { id: "home",          label: "Page principale",    icon: "file" },
     { id: "gym-page",      label: "Page Gym",           icon: "leaf" },
     { id: "gym",           label: "Planning Gym",       icon: "calendar" },
     { id: "rando-page",    label: "Page Randonnée",     icon: "mountain" },
@@ -42,8 +44,25 @@ function AdminSidebar({ section, setSection, user }) {
     { id: "ag",            label: "Assemblée générale", icon: "file" },
     { id: "tarifs",        label: "Tarifs",             icon: "file" },
     { divider: "" },
-    { id: "settings",   label: "Paramètres",        icon: "settings" },
+    { id: "settings",      label: "Paramètres",         icon: "settings", always: true },
+    ...(isSuperAdmin ? [{ id: "access", label: "Gestion des accès", icon: "user", always: true }] : []),
   ]
+
+  // IDs visibles (always + ceux autorisés)
+  const visibleIds = new Set(
+    allItems.filter(it => it.id && (it.always || canAccess(it.id))).map(it => it.id)
+  )
+
+  // Ne conserver un divider que s'il précède au moins un item visible
+  const items = allItems.reduce((acc, it, i, arr) => {
+    if (it.divider !== undefined) {
+      const hasVisible = arr.slice(i + 1).some(x => x.divider !== undefined ? false : x.id && visibleIds.has(x.id))
+      if (hasVisible) acc.push(it)
+    } else if (!it.id || visibleIds.has(it.id)) {
+      acc.push(it)
+    }
+    return acc
+  }, [])
 
   const handleLogout = async () => {
     const supabase = createClient()
@@ -563,30 +582,43 @@ const ADMIN_CSS = `
 `
 
 // ── App ───────────────────────────────────────────────────────
-export default function AdminApp({ user }) {
+export default function AdminApp({ user, profile }) {
   const [section, setSection] = useState("dash")
+
+  const isSuperAdmin = profile?.role === 'super_admin'
+
+  // Un super_admin a accès à tout. Un admin classique seulement à ses permissions.
+  const canAccess = (id) => isSuperAdmin || (profile?.permissions ?? []).includes(id)
+
   return (
     <>
       <style>{ADMIN_CSS}</style>
       <div className="admin-shell">
-        <AdminSidebar section={section} setSection={setSection} user={user}/>
+        <AdminSidebar
+          section={section}
+          setSection={setSection}
+          user={user}
+          canAccess={canAccess}
+          isSuperAdmin={isSuperAdmin}
+        />
         <div className="admin-main">
-          {section === "dash"     && <Dashboard setSection={setSection}/>}
-          {section === "gym"      && <AdminGymSection/>}
-          {section === "rando"    && <AdminRandoSection/>}
-          {section === "sejours"  && <AdminSejours/>}
-          {section === "actu"     && <AdminActuSection/>}
-          {section === "galerie"  && <AdminGalerieSection/>}
-          {section === "home"     && <AdminHomeSection/>}
-          {section === "gym-page"      && <AdminGymPageSection/>}
-          {section === "rando-page"    && <AdminRandoPageSection/>}
-          {section === "nordique-page" && <AdminNordiquePageSection/>}
-          {section === "sante-page"    && <AdminSantePageSection/>}
-          {section === "asso-page"     && <AdminAssoPageSection/>}
-          {section === "comite"        && <AdminComiteSection/>}
-          {section === "ag"            && <AdminAGSection/>}
-          {section === "tarifs"        && <AdminTarifs/>}
+          {section === "dash"          && <Dashboard setSection={setSection}/>}
+          {section === "gym"           && canAccess("gym")           && <AdminGymSection/>}
+          {section === "rando"         && canAccess("rando")         && <AdminRandoSection/>}
+          {section === "sejours"       && canAccess("sejours")       && <AdminSejours/>}
+          {section === "actu"          && canAccess("actu")          && <AdminActuSection/>}
+          {section === "galerie"       && canAccess("galerie")       && <AdminGalerieSection/>}
+          {section === "home"          && canAccess("home")          && <AdminHomeSection/>}
+          {section === "gym-page"      && canAccess("gym-page")      && <AdminGymPageSection/>}
+          {section === "rando-page"    && canAccess("rando-page")    && <AdminRandoPageSection/>}
+          {section === "nordique-page" && canAccess("nordique-page") && <AdminNordiquePageSection/>}
+          {section === "sante-page"    && canAccess("sante-page")    && <AdminSantePageSection/>}
+          {section === "asso-page"     && canAccess("asso-page")     && <AdminAssoPageSection/>}
+          {section === "comite"        && canAccess("comite")        && <AdminComiteSection/>}
+          {section === "ag"            && canAccess("ag")            && <AdminAGSection/>}
+          {section === "tarifs"        && canAccess("tarifs")        && <AdminTarifs/>}
           {section === "settings"      && <AdminSettings user={user}/>}
+          {section === "access"        && isSuperAdmin               && <AdminAccessSection/>}
         </div>
       </div>
     </>

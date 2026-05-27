@@ -1,6 +1,5 @@
 'use client'
-import { useState, useMemo } from 'react'
-import Link from 'next/link'
+import { useState, useMemo, useRef, useEffect } from 'react'
 import Icon from '@/components/ui/Icon'
 import { monthFR, monthFRFull } from '@/utils/format'
 
@@ -38,9 +37,85 @@ function exportPDF(courses, weekLabel) {
   w.print()
 }
 
+// ── Dropdown multi-sélection ───────────────────────────────────
+function DiscDropdown({ disciplines, selected, onChange }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef()
+
+  useEffect(() => {
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false) }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  const toggle = (disc) => {
+    const next = new Set(selected)
+    next.has(disc) ? next.delete(disc) : next.add(disc)
+    onChange(next)
+  }
+
+  const allSelected = selected.size === 0
+  const label = allSelected
+    ? 'Toutes les disciplines'
+    : selected.size === 1
+      ? [...selected][0]
+      : `${selected.size} disciplines`
+
+  return (
+    <div ref={ref} style={{ position: "relative" }}>
+      <button
+        className="btn btn-ghost btn-sm"
+        onClick={() => setOpen(o => !o)}
+        style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 200, justifyContent: "space-between" }}
+      >
+        <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <Icon name="filter" size={14}/>
+          {label}
+        </span>
+        {!allSelected && (
+          <span style={{ background: "var(--accent)", color: "#fff", borderRadius: "99px", fontSize: "0.72rem", padding: "1px 7px", fontWeight: 700 }}>
+            {selected.size}
+          </span>
+        )}
+        <Icon name={open ? "chevronUp" : "chevronDown"} size={12}/>
+      </button>
+
+      {open && (
+        <div style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, zIndex: 50, background: "var(--bg-card)", border: "1px solid var(--line)", borderRadius: "var(--r-md)", boxShadow: "var(--sh-md)", minWidth: 240, padding: "8px 0" }}>
+          {/* Tout / Réinitialiser */}
+          <button
+            onClick={() => onChange(new Set())}
+            style={{ width: "100%", padding: "8px 16px", background: "none", border: "none", textAlign: "left", cursor: "pointer", fontSize: "0.88rem", color: allSelected ? "var(--accent)" : "var(--ink-mute)", fontWeight: allSelected ? 600 : 400, borderBottom: "1px solid var(--line-soft)", marginBottom: 4 }}
+          >
+            Toutes les disciplines
+          </button>
+
+          {disciplines.map(d => (
+            <label
+              key={d}
+              style={{ display: "flex", alignItems: "center", gap: 10, padding: "7px 16px", cursor: "pointer", fontSize: "0.92rem", color: "var(--ink-soft)" }}
+              onMouseEnter={e => e.currentTarget.style.background = "var(--bg-elev)"}
+              onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+            >
+              <input
+                type="checkbox"
+                checked={selected.has(d)}
+                onChange={() => toggle(d)}
+                style={{ accentColor: "var(--accent)", width: 15, height: 15, cursor: "pointer" }}
+              />
+              {d}
+            </label>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── Main component ─────────────────────────────────────────────
 export default function PlanningGymClient({ courses }) {
   const [weekOffset, setWeekOffset] = useState(0)
-  const [discFilter, setDiscFilter] = useState("all")
+  const [selected, setSelected] = useState(new Set()) // empty = toutes
 
   const monday = useMemo(() => {
     const d = new Date()
@@ -61,7 +136,9 @@ export default function PlanningGymClient({ courses }) {
     [...new Set(courses.map(c => c.discipline))].sort()
   , [courses])
 
-  const visibleCourses = discFilter === "all" ? courses : courses.filter(c => c.discipline === discFilter)
+  const visibleCourses = useMemo(() =>
+    selected.size === 0 ? courses : courses.filter(c => selected.has(c.discipline))
+  , [courses, selected])
 
   return (
     <section className="section">
@@ -81,16 +158,10 @@ export default function PlanningGymClient({ courses }) {
               Aujourd'hui
             </button>
           )}
+          <DiscDropdown disciplines={disciplines} selected={selected} onChange={setSelected}/>
           <button className="btn btn-ghost btn-sm" onClick={() => exportPDF(visibleCourses, weekLabel)}>
             <Icon name="download" size={14}/> PDF
           </button>
-        </div>
-
-        <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
-          <button className={`chip ${discFilter === "all" ? "active" : ""}`} onClick={() => setDiscFilter("all")}>Toutes</button>
-          {disciplines.map(d => (
-            <button key={d} className={`chip ${discFilter === d ? "active" : ""}`} onClick={() => setDiscFilter(d)}>{d}</button>
-          ))}
         </div>
 
         <div className="gym-grid">

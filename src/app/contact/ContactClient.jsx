@@ -3,8 +3,42 @@ import { useState } from 'react'
 import Icon from '@/components/ui/Icon'
 
 export default function ContactClient() {
-  const [form, setForm] = useState({ prenom: "", nom: "", email: "", sujet: "Inscription", message: "" })
-  const u = (k, v) => setForm({ ...form, [k]: v })
+  const [form, setForm] = useState({ prenom: "", nom: "", email: "", sujet: "Inscription", message: "", website: "" })
+  const [status, setStatus] = useState("idle")
+  const [feedback, setFeedback] = useState("")
+  const u = (k, v) => {
+    setForm({ ...form, [k]: v })
+    if (status !== "idle") {
+      setStatus("idle")
+      setFeedback("")
+    }
+  }
+
+  const submit = async (e) => {
+    e.preventDefault()
+    setStatus("sending")
+    setFeedback("")
+
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      })
+      const data = await res.json().catch(() => ({}))
+
+      if (!res.ok || data.ok === false) {
+        throw new Error(data.error || "Le message n'a pas pu être envoyé.")
+      }
+
+      setForm({ prenom: "", nom: "", email: "", sujet: "Inscription", message: "", website: "" })
+      setStatus("success")
+      setFeedback("Votre message a bien été envoyé. Nous vous répondrons rapidement.")
+    } catch (error) {
+      setStatus("error")
+      setFeedback(error.message || "Le message n'a pas pu être envoyé.")
+    }
+  }
 
   return (
     <section className="section">
@@ -40,27 +74,33 @@ export default function ContactClient() {
             <div style={{ marginTop: 20, padding: 24, background: "var(--green-tint)", border: "1px solid var(--green-soft)", borderRadius: "var(--r-md)" }}>
               <h4 style={{ marginBottom: 10 }}>Première séance gratuite</h4>
               <p style={{ margin: 0, fontSize: "0.94rem", color: "var(--ink-soft)" }}>
-                Vous pouvez assister à une séance d'essai gratuite sans inscription préalable pour la gym et la randonnée.
+                Vous pouvez assister à une séance d&apos;essai gratuite sans inscription préalable pour la gym et la randonnée.
               </p>
             </div>
           </div>
 
           <div>
             <h3 style={{ marginBottom: 24 }}>Formulaire de contact</h3>
-            <div className="form">
+            <form className="form" onSubmit={submit}>
+              <div style={{ position: "absolute", left: "-10000px", width: 1, height: 1, overflow: "hidden" }} aria-hidden="true">
+                <label>
+                  Site web
+                  <input tabIndex={-1} autoComplete="off" value={form.website} onChange={e => u("website", e.target.value)}/>
+                </label>
+              </div>
               <div className="row-2">
                 <div className="field">
                   <label>Prénom</label>
-                  <input value={form.prenom} onChange={e => u("prenom", e.target.value)} placeholder="Votre prénom"/>
+                  <input value={form.prenom} onChange={e => u("prenom", e.target.value)} placeholder="Votre prénom" required autoComplete="given-name"/>
                 </div>
                 <div className="field">
                   <label>Nom</label>
-                  <input value={form.nom} onChange={e => u("nom", e.target.value)} placeholder="Votre nom"/>
+                  <input value={form.nom} onChange={e => u("nom", e.target.value)} placeholder="Votre nom" required autoComplete="family-name"/>
                 </div>
               </div>
               <div className="field">
                 <label>Email</label>
-                <input type="email" value={form.email} onChange={e => u("email", e.target.value)} placeholder="votre@email.fr"/>
+                <input type="email" value={form.email} onChange={e => u("email", e.target.value)} placeholder="votre@email.fr" required autoComplete="email"/>
               </div>
               <div className="field">
                 <label>Sujet</label>
@@ -72,12 +112,28 @@ export default function ContactClient() {
               </div>
               <div className="field">
                 <label>Message</label>
-                <textarea rows={5} value={form.message} onChange={e => u("message", e.target.value)} placeholder="Votre message..."/>
+                <textarea rows={5} value={form.message} onChange={e => u("message", e.target.value)} placeholder="Votre message..." required maxLength={3000}/>
               </div>
-              <button className="btn btn-primary" style={{ alignSelf: "flex-start" }}>
-                Envoyer le message
+              {feedback && (
+                <p
+                  role={status === "error" ? "alert" : "status"}
+                  style={{
+                    margin: 0,
+                    padding: "12px 14px",
+                    borderRadius: "var(--r-sm)",
+                    border: `1px solid ${status === "error" ? "var(--accent)" : "var(--green-soft)"}`,
+                    background: status === "error" ? "var(--accent-tint)" : "var(--green-tint)",
+                    color: "var(--ink-soft)",
+                    fontSize: "0.94rem",
+                  }}
+                >
+                  {feedback}
+                </p>
+              )}
+              <button className="btn btn-primary" type="submit" disabled={status === "sending"} style={{ alignSelf: "flex-start" }}>
+                {status === "sending" ? "Envoi en cours..." : "Envoyer le message"}
               </button>
-            </div>
+            </form>
           </div>
 
         </div>

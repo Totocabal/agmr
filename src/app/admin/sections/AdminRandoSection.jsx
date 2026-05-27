@@ -84,6 +84,11 @@ export default function AdminRandoSection() {
     fetchData()
   }
 
+  const togAnnule = async (id, annule) => {
+    await supabase.from('rando_sorties').update({ annule: !annule }).eq('id', id)
+    fetchData()
+  }
+
   const blank = {
     date: new Date().toISOString().slice(0,10),
     type: "rando-jeudi",
@@ -127,8 +132,17 @@ export default function AdminRandoSection() {
                 {!s.complet && !s.annule && <span className="badge badge-ok">Ouverte</span>}
               </td>
               <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
-                <button className="btn btn-sm btn-ghost" onClick={() => togComplet(s.id, s.complet)}>
-                  {s.complet ? "Rouvrir" : "Complet"}
+                {!s.annule && (
+                  <button className="btn btn-sm btn-ghost" onClick={() => togComplet(s.id, s.complet)} style={{ marginRight: 4 }}>
+                    {s.complet ? "Rouvrir" : "Complet"}
+                  </button>
+                )}
+                <button
+                  className="btn btn-sm btn-ghost"
+                  onClick={() => togAnnule(s.id, s.annule)}
+                  style={{ color: s.annule ? "var(--green)" : "var(--accent)" }}
+                >
+                  {s.annule ? "Rétablir" : "Annuler"}
                 </button>
                 <button className="icon-btn" onClick={() => setEditing(s)} style={{ marginLeft: 4 }}><Icon name="edit" size={14}/></button>
                 <button className="icon-btn" onClick={() => del(s.id)} style={{ marginLeft: 4 }}><Icon name="trash" size={14}/></button>

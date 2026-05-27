@@ -230,6 +230,33 @@ export async function deleteActualite(id) {
 }
 
 
+export async function getHomeBlocks() {
+  const { data, error } = await supabase
+    .from('home_blocks')
+    .select('*')
+    .order('ordre')
+  if (error) { console.error(error); return [] }
+  return data
+}
+
+export async function updateHomeBlock(key, content) {
+  const { error } = await supabase
+    .from('home_blocks')
+    .update({ content })
+    .eq('block_key', key)
+  if (error) { console.error(error); return false }
+  return true
+}
+
+export async function setHomeBlockVisible(key, visible) {
+  const { error } = await supabase
+    .from('home_blocks')
+    .update({ visible })
+    .eq('block_key', key)
+  if (error) { console.error(error); return false }
+  return true
+}
+
 export async function getSiteStats() {
   const { data, error } = await supabase
     .from('site_stats')

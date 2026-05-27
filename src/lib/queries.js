@@ -230,6 +230,27 @@ export async function deleteActualite(id) {
 }
 
 
+export async function getSiteStats() {
+  const { data, error } = await supabase
+    .from('site_stats')
+    .select('*')
+    .order('ordre')
+  if (error) { console.error(error); return { hero: [], band: [] } }
+  return {
+    hero: data.filter(s => s.section === 'hero').map(s => [s.valeur, s.label, s.id]),
+    band: data.filter(s => s.section === 'band').map(s => [s.valeur, s.label, s.id]),
+  }
+}
+
+export async function updateSiteStat(id, valeur, label) {
+  const { error } = await supabase
+    .from('site_stats')
+    .update({ valeur, label })
+    .eq('id', id)
+  if (error) { console.error(error); return false }
+  return true
+}
+
 export async function getGaleriePhotos() {
   const { data, error } = await supabase
     .from('galerie_photos')

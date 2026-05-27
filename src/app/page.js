@@ -3,8 +3,10 @@ import Header from '@/components/shell/Header'
 import Footer from '@/components/shell/Footer'
 import { news } from '@/data'
 import { formatDateFR, catLabel } from '@/utils/format'
+import { getSiteStats } from '@/lib/queries'
 
-export default function HomePage() {
+export default async function HomePage() {
+  const stats = await getSiteStats()
   return (
     <div className="page-shell">
       <Header/>
@@ -33,7 +35,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className="hero-meta">
-            {[["750","Adherents"],["54","Annees"],["3","Disciplines"]].map(([n,l]) => (
+            {stats.hero.map(([n,l]) => (
               <div key={l}>
                 <div className="hero-meta-num">{n}</div>
                 <div className="hero-meta-lbl">{l}</div>
@@ -112,12 +114,7 @@ export default function HomePage() {
         {/* STATS */}
         <section className="stats-band">
           <div className="stats-grid">
-            {[
-              ["750+","Adherents en 2025-2026"],
-              ["43h","de cours de gym chaque semaine"],
-              ["25","animateurs benevoles randonnee"],
-              ["5","salles municipales partenaires"],
-            ].map(([n,l]) => (
+            {stats.band.map(([n,l]) => (
               <div key={n} className="stat-item">
                 <div className="stat-num">{n}</div>
                 <div className="stat-label">{l}</div>

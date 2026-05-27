@@ -10,6 +10,7 @@ import AdminGymSection from './sections/AdminGymSection'
 import AdminActuSection from './sections/AdminActuSection'
 import AdminRandoSection from './sections/AdminRandoSection'
 import AdminGalerieSection from './sections/AdminGalerieSection'
+import AdminStatsSection from './sections/AdminStatsSection'
 
 // ── Sidebar ───────────────────────────────────────────────────
 function AdminSidebar({ section, setSection, user }) {
@@ -21,6 +22,7 @@ function AdminSidebar({ section, setSection, user }) {
     { id: "sejours", label: "Séjours", icon: "pin" },
     { id: "actu", label: "Actualités", icon: "file" },
     { id: "galerie", label: "Galerie", icon: "image" },
+    { id: "stats", label: "Chiffres clés", icon: "home" },
     { id: "comite", label: "Comité directeur", icon: "user" },
     { id: "tarifs", label: "Tarifs", icon: "file" },
     { id: "settings", label: "Paramètres", icon: "settings" },
@@ -533,6 +535,7 @@ export default function AdminApp({ user }) {
           {section === "sejours"  && <AdminSejours/>}
           {section === "actu"     && <AdminActuSection/>}
           {section === "galerie"  && <AdminGalerieSection/>}
+          {section === "stats"    && <AdminStatsSection/>}
           {section === "comite"   && <AdminComite/>}
           {section === "tarifs"   && <AdminTarifs/>}
           {section === "settings" && <AdminSettings user={user}/>}

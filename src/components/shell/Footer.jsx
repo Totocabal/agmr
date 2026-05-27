@@ -50,7 +50,6 @@ export default function Footer() {
           <ul className="footer-list">
             <li><Link href="/contact">Contact</Link></li>
             <li><Link href="/espace-adherents">Espace adherents</Link></li>
-            <li><Link href="/boutique">Boutique AGMR</Link></li>
             <li><Link href="/admin">Administration</Link></li>
             <li><Link href="/mentions-legales">Mentions legales</Link></li>
           </ul>

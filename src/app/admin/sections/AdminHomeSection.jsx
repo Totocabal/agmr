@@ -1,7 +1,8 @@
 'use client'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import Icon from '@/components/ui/Icon'
 import { createClient } from '@/lib/supabase-client'
+import PhotoUpload from '@/components/admin/PhotoUpload'
 
 const BLOCK_META = {
   hero:          { label: 'Hero',                   desc: 'Accroche, titre, sous-titre, boutons' },
@@ -22,49 +23,6 @@ function Modal({ title, onClose, children }) {
           <button className="icon-btn" onClick={onClose}><Icon name="x" size={14}/></button>
         </div>
         <div className="modal-body">{children}</div>
-      </div>
-    </div>
-  )
-}
-
-// ── Photo upload ───────────────────────────────────────────────
-function PhotoUpload({ value, onChange, supabase }) {
-  const [uploading, setUploading] = useState(false)
-  const inputRef = useRef()
-
-  const handleFile = async (e) => {
-    const file = e.target.files[0]
-    if (!file) return
-    setUploading(true)
-    const ext = file.name.split('.').pop()
-    const fileName = `home/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-    const { error } = await supabase.storage.from('galerie').upload(fileName, file, { upsert: true })
-    if (error) { alert('Erreur upload : ' + error.message); setUploading(false); return }
-    const { data: { publicUrl } } = supabase.storage.from('galerie').getPublicUrl(fileName)
-    onChange(publicUrl)
-    setUploading(false)
-    inputRef.current.value = ''
-  }
-
-  return (
-    <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-      {value ? (
-        <img src={value} alt="" style={{ width: 100, height: 72, objectFit: "cover", borderRadius: "var(--r-sm)", border: "1px solid var(--line)", flexShrink: 0 }}/>
-      ) : (
-        <div style={{ width: 100, height: 72, background: "var(--bg-deep)", borderRadius: "var(--r-sm)", border: "2px dashed var(--line-strong)", display: "grid", placeItems: "center", color: "var(--ink-mute)", flexShrink: 0 }}>
-          <Icon name="image" size={22}/>
-        </div>
-      )}
-      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-        <input ref={inputRef} type="file" accept="image/*" onChange={handleFile} style={{ display: "none" }}/>
-        <button type="button" className="btn btn-ghost btn-sm" onClick={() => inputRef.current.click()} disabled={uploading}>
-          <Icon name="download" size={12}/> {uploading ? 'Upload en cours…' : value ? 'Changer la photo' : 'Choisir une photo'}
-        </button>
-        {value && (
-          <button type="button" className="btn btn-ghost btn-sm" onClick={() => onChange('')} style={{ color: "var(--accent)", fontSize: "0.8rem" }}>
-            Retirer la photo
-          </button>
-        )}
       </div>
     </div>
   )
@@ -254,7 +212,7 @@ function BlockForm({ block, onSave, onCancel, supabase }) {
       {key === 'hero' && <>
         <div className="field">
           <label>Photo de fond</label>
-          <PhotoUpload value={c.photo_url ?? ''} onChange={url => u('photo_url', url)} supabase={supabase}/>
+          <PhotoUpload value={c.photo_url ?? ''} onChange={url => u('photo_url', url)} supabase={supabase} folder="home" shape="rect"/>
           <div style={{ marginTop: 8, padding: "10px 14px", background: "var(--bg-deep)", borderRadius: "var(--r-sm)", fontSize: "0.8rem", color: "var(--ink-mute)", lineHeight: 1.6 }}>
             <strong style={{ color: "var(--ink-soft)" }}>Specs recommandées</strong><br/>
             Format : JPG ou WebP · Dimensions : 1920 × 1080 px minimum<br/>
@@ -296,7 +254,7 @@ function BlockForm({ block, onSave, onCancel, supabase }) {
 
       {key === 'trio' && <>
         <div className="field"><label>Photo illustrative</label>
-          <PhotoUpload value={c.photo_url ?? ''} onChange={url => u('photo_url', url)} supabase={supabase}/>
+          <PhotoUpload value={c.photo_url ?? ''} onChange={url => u('photo_url', url)} supabase={supabase} folder="home" shape="rect"/>
         </div>
         <div className="row-2">
           <div className="field"><label>Étiquette photo</label>
@@ -324,7 +282,7 @@ function BlockForm({ block, onSave, onCancel, supabase }) {
 
       {key === 'manifesto' && <>
         <div className="field"><label>Photo illustrative</label>
-          <PhotoUpload value={c.photo_url ?? ''} onChange={url => u('photo_url', url)} supabase={supabase}/>
+          <PhotoUpload value={c.photo_url ?? ''} onChange={url => u('photo_url', url)} supabase={supabase} folder="home" shape="rect"/>
         </div>
         <div className="row-2">
           <div className="field"><label>Badge — texte</label>

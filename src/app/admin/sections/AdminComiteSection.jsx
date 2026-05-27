@@ -1,7 +1,8 @@
 'use client'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import Icon from '@/components/ui/Icon'
 import { createClient } from '@/lib/supabase-client'
+import PhotoUpload from '@/components/admin/PhotoUpload'
 
 function Modal({ title, onClose, children }) {
   return (
@@ -12,44 +13,6 @@ function Modal({ title, onClose, children }) {
           <button className="icon-btn" onClick={onClose}><Icon name="x" size={14}/></button>
         </div>
         <div className="modal-body">{children}</div>
-      </div>
-    </div>
-  )
-}
-
-function PhotoUpload({ value, onChange, supabase }) {
-  const [uploading, setUploading] = useState(false)
-  const inputRef = useRef()
-
-  const handleFile = async (e) => {
-    const file = e.target.files[0]
-    if (!file) return
-    setUploading(true)
-    const ext = file.name.split('.').pop()
-    const fileName = `bureau/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-    const { error } = await supabase.storage.from('galerie').upload(fileName, file, { upsert: true })
-    if (error) { alert('Erreur upload : ' + error.message); setUploading(false); return }
-    const { data: { publicUrl } } = supabase.storage.from('galerie').getPublicUrl(fileName)
-    onChange(publicUrl)
-    setUploading(false)
-    inputRef.current.value = ''
-  }
-
-  return (
-    <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-      {value ? (
-        <img src={value} alt="" style={{ width: 64, height: 64, objectFit: "cover", borderRadius: "50%", border: "1px solid var(--line)", flexShrink: 0 }}/>
-      ) : (
-        <div style={{ width: 64, height: 64, background: "var(--bg-deep)", borderRadius: "50%", border: "2px dashed var(--line-strong)", display: "grid", placeItems: "center", color: "var(--ink-mute)", flexShrink: 0 }}>
-          <Icon name="user" size={20}/>
-        </div>
-      )}
-      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-        <input ref={inputRef} type="file" accept="image/*" onChange={handleFile} style={{ display: "none" }}/>
-        <button type="button" className="btn btn-ghost btn-sm" onClick={() => inputRef.current.click()} disabled={uploading}>
-          <Icon name="download" size={12}/> {uploading ? 'Upload…' : value ? 'Changer' : 'Choisir une photo'}
-        </button>
-        {value && <button type="button" className="btn btn-ghost btn-sm" onClick={() => onChange('')} style={{ color: "var(--accent)", fontSize: "0.8rem" }}>Retirer</button>}
       </div>
     </div>
   )
@@ -228,7 +191,7 @@ function BureauForm({ item, onSave, onCancel, supabase }) {
   const u = (k, v) => setF(p => ({ ...p, [k]: v }))
   return (
     <div className="form">
-      <div className="field"><label>Photo</label><PhotoUpload value={f.photo_url} onChange={v => u('photo_url', v)} supabase={supabase}/></div>
+      <div className="field"><label>Photo</label><PhotoUpload value={f.photo_url} onChange={v => u('photo_url', v)} supabase={supabase} folder="bureau"/></div>
       <div className="field"><label>Nom complet</label><input value={f.nom} onChange={e => u('nom', e.target.value)} placeholder="Prénom NOM"/></div>
       <div className="row-2">
         <div className="field">
@@ -252,7 +215,7 @@ function AnimForm({ item, onSave, onCancel, supabase }) {
   const u = (k, v) => setF(p => ({ ...p, [k]: v }))
   return (
     <div className="form">
-      <div className="field"><label>Photo</label><PhotoUpload value={f.photo_url} onChange={v => u('photo_url', v)} supabase={supabase}/></div>
+      <div className="field"><label>Photo</label><PhotoUpload value={f.photo_url} onChange={v => u('photo_url', v)} supabase={supabase} folder="animateurs"/></div>
       <div className="field"><label>Nom complet</label><input value={f.nom} onChange={e => u('nom', e.target.value)}/></div>
       <div className="field"><label>Rôle / titre</label><input value={f.role} onChange={e => u('role', e.target.value)} placeholder="Animatrice diplômée d'État"/></div>
       <div className="field"><label>Disciplines</label><input value={f.disciplines} onChange={e => u('disciplines', e.target.value)} placeholder="Pilates, Yoga…"/></div>

@@ -278,6 +278,38 @@ export async function updateSiteStat(id, valeur, label) {
   return true
 }
 
+// ── Gym page blocks ──────────────────────────────────────────
+export async function getGymPageBlocks() {
+  const { data, error } = await supabase
+    .from('gym_page_blocks')
+    .select('*')
+    .order('ordre')
+  if (error) { console.error(error); return [] }
+  return data
+}
+
+// ── Gym disciplines (public — visible only) ──────────────────
+export async function getGymDisciplines() {
+  const { data, error } = await supabase
+    .from('gym_disciplines')
+    .select('*')
+    .eq('visible', true)
+    .order('ordre')
+  if (error) { console.error(error); return [] }
+  return data
+}
+
+// ── Gym animateurs (public — visible only) ───────────────────
+export async function getGymAnimateurs() {
+  const { data, error } = await supabase
+    .from('gym_animateurs')
+    .select('*')
+    .eq('visible', true)
+    .order('ordre')
+  if (error) { console.error(error); return [] }
+  return data
+}
+
 export async function getGaleriePhotos() {
   const { data, error } = await supabase
     .from('galerie_photos')

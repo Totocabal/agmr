@@ -23,23 +23,38 @@ export default async function ComitePage() {
         <section className="section">
           <div className="container">
 
-            <h2 style={{ fontSize: "2rem", marginBottom: 28 }}>Le bureau</h2>
-            <div className="team-grid" style={{ marginBottom: 64 }}>
-              {bureau.map(b => (
-                <div key={b.id} className="team-card">
-                  <div
-                    className="team-photo"
-                    style={b.photo_url ? { backgroundImage: `url(${b.photo_url})`, backgroundSize: "cover", backgroundPosition: "center" } : undefined}
-                  >
-                    {!b.photo_url && <div className="team-photo-initial">{b.nom.charAt(0)}</div>}
-                  </div>
-                  <div className="team-body">
-                    <div className="team-name">{b.nom}</div>
-                    <div className="team-role">{b.role}</div>
+            {/* Groupement par catégorie */}
+            {(() => {
+              const groups = bureau.reduce((acc, b) => {
+                const g = b.groupe ?? 'Membres du bureau'
+                if (!acc[g]) acc[g] = []
+                acc[g].push(b)
+                return acc
+              }, {})
+              const ORDER = ['Bureau exécutif', 'Responsables d\'activités', 'Membres du bureau']
+              const sorted = ORDER.filter(g => groups[g]).concat(Object.keys(groups).filter(g => !ORDER.includes(g)))
+              return sorted.map((groupe, gi) => (
+                <div key={groupe} style={{ marginBottom: gi < sorted.length - 1 ? 56 : 0 }}>
+                  <h2 style={{ fontSize: "1.6rem", marginBottom: 24 }}>{groupe}</h2>
+                  <div className="team-grid">
+                    {groups[groupe].map(b => (
+                      <div key={b.id} className="team-card">
+                        <div
+                          className="team-photo"
+                          style={b.photo_url ? { backgroundImage: `url(${b.photo_url})`, backgroundSize: "cover", backgroundPosition: "center" } : undefined}
+                        >
+                          {!b.photo_url && <div className="team-photo-initial">{b.nom.charAt(0)}</div>}
+                        </div>
+                        <div className="team-body">
+                          <div className="team-name">{b.nom}</div>
+                          <div className="team-role">{b.role}</div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
-              ))}
-            </div>
+              ))
+            })()}
 
             {animateurs.length > 0 && (
               <>

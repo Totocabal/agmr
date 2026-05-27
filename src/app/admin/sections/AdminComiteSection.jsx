@@ -77,7 +77,7 @@ export default function AdminComiteSection() {
 
   // Bureau ops
   const saveBureau = async (data) => {
-    const payload = { nom: data.nom, role: data.role, photo_url: data.photo_url || null }
+    const payload = { nom: data.nom, role: data.role, groupe: data.groupe || 'Membres du bureau', photo_url: data.photo_url || null }
     if (data.id) {
       await supabase.from('bureau').update(payload).eq('id', data.id)
     } else {
@@ -143,7 +143,7 @@ export default function AdminComiteSection() {
       {activeTab === 'bureau' && (
         <>
           <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}>
-            <button className="btn btn-primary" onClick={() => setEditingB({ nom: '', role: '', photo_url: '' })}>
+            <button className="btn btn-primary" onClick={() => setEditingB({ nom: '', role: '', groupe: 'Membres du bureau', photo_url: '' })}>
               <Icon name="plus" size={14}/> Ajouter un membre
             </button>
           </div>
@@ -160,6 +160,7 @@ export default function AdminComiteSection() {
                 <div style={{ flex: 1 }}>
                   <div style={{ fontWeight: 600 }}>{b.nom}</div>
                   <div className="muted" style={{ fontSize: "0.84rem" }}>{b.role}</div>
+                  <div style={{ fontSize: "0.76rem", color: "var(--ink-mute)", marginTop: 2 }}>{b.groupe}</div>
                 </div>
                 <div style={{ display: "flex", gap: 6 }}>
                   <button className="icon-btn" onClick={() => setEditingB(b)}><Icon name="edit" size={14}/></button>
@@ -220,14 +221,24 @@ export default function AdminComiteSection() {
   )
 }
 
+const GROUPES_BUREAU = ['Bureau exécutif', 'Responsables d\'activités', 'Membres du bureau']
+
 function BureauForm({ item, onSave, onCancel, supabase }) {
-  const [f, setF] = useState({ nom: item.nom ?? '', role: item.role ?? '', photo_url: item.photo_url ?? '', id: item.id })
+  const [f, setF] = useState({ nom: item.nom ?? '', role: item.role ?? '', groupe: item.groupe ?? 'Membres du bureau', photo_url: item.photo_url ?? '', id: item.id })
   const u = (k, v) => setF(p => ({ ...p, [k]: v }))
   return (
     <div className="form">
       <div className="field"><label>Photo</label><PhotoUpload value={f.photo_url} onChange={v => u('photo_url', v)} supabase={supabase}/></div>
-      <div className="field"><label>Nom complet</label><input value={f.nom} onChange={e => u('nom', e.target.value)} placeholder="Marie Martin"/></div>
-      <div className="field"><label>Rôle / fonction</label><input value={f.role} onChange={e => u('role', e.target.value)} placeholder="Présidente"/></div>
+      <div className="field"><label>Nom complet</label><input value={f.nom} onChange={e => u('nom', e.target.value)} placeholder="Prénom NOM"/></div>
+      <div className="row-2">
+        <div className="field">
+          <label>Groupe</label>
+          <select value={f.groupe} onChange={e => u('groupe', e.target.value)}>
+            {GROUPES_BUREAU.map(g => <option key={g} value={g}>{g}</option>)}
+          </select>
+        </div>
+        <div className="field"><label>Rôle / fonction</label><input value={f.role} onChange={e => u('role', e.target.value)} placeholder="Président"/></div>
+      </div>
       <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 8 }}>
         <button className="btn btn-ghost" onClick={onCancel}>Annuler</button>
         <button className="btn btn-primary" onClick={() => onSave(f)}>Enregistrer</button>

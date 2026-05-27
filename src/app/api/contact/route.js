@@ -1,5 +1,23 @@
 import { getResend } from '@/lib/resend'
 
+// ── reCAPTCHA v3 ──────────────────────────────────────────────
+const RECAPTCHA_SECRET = process.env.RECAPTCHA_SECRET_KEY
+const RECAPTCHA_MIN_SCORE = 0.5 // 0.0 = bot certain, 1.0 = humain certain
+
+async function verifyRecaptcha(token) {
+  if (!RECAPTCHA_SECRET) return true   // Pas de clé configurée → on laisse passer
+  if (!token) return false              // Clé configurée mais token absent → refus
+
+  const res = await fetch('https://www.google.com/recaptcha/api/siteverify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: `secret=${RECAPTCHA_SECRET}&response=${token}`,
+  })
+  const data = await res.json()
+  // data.success = token valide, data.score = score humain
+  return data.success && (data.score ?? 0) >= RECAPTCHA_MIN_SCORE
+}
+
 const SUBJECTS = new Set([
   'Inscription',
   'Randonnée',
@@ -35,8 +53,15 @@ export async function POST(request) {
     return jsonError('Requête invalide.')
   }
 
+  // Honeypot (bot remplit le champ caché "website")
   if (payload.website) {
     return Response.json({ ok: true })
+  }
+
+  // Vérification reCAPTCHA v3
+  const recaptchaOk = await verifyRecaptcha(payload.recaptchaToken)
+  if (!recaptchaOk) {
+    return jsonError("Vérification anti-spam échouée. Rechargez la page et réessayez.", 400)
   }
 
   const prenom = clean(payload.prenom, 80)

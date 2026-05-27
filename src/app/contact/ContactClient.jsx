@@ -1,6 +1,32 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Icon from '@/components/ui/Icon'
+
+const SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY
+
+// Charge le script reCAPTCHA v3 une seule fois
+function loadRecaptcha() {
+  if (!SITE_KEY || document.getElementById('recaptcha-script')) return
+  const script = document.createElement('script')
+  script.id = 'recaptcha-script'
+  script.src = `https://www.google.com/recaptcha/api.js?render=${SITE_KEY}`
+  script.async = true
+  document.head.appendChild(script)
+}
+
+function getRecaptchaToken(action = 'contact') {
+  return new Promise((resolve, reject) => {
+    if (!SITE_KEY) { resolve(null); return }
+    window.grecaptcha.ready(async () => {
+      try {
+        const token = await window.grecaptcha.execute(SITE_KEY, { action })
+        resolve(token)
+      } catch (err) {
+        reject(err)
+      }
+    })
+  })
+}
 
 export default function ContactClient() {
   const [form, setForm] = useState({ prenom: "", nom: "", email: "", sujet: "Inscription", message: "", website: "" })
@@ -13,6 +39,8 @@ export default function ContactClient() {
       setFeedback("")
     }
   }
+
+  useEffect(() => { loadRecaptcha() }, [])
 
   const submit = async (e) => {
     e.preventDefault()
@@ -31,11 +59,19 @@ export default function ContactClient() {
       return
     }
 
+    // Récupère le token reCAPTCHA v3 (invisible)
+    let recaptchaToken = null
+    try {
+      recaptchaToken = await getRecaptchaToken('contact')
+    } catch {
+      // En cas d'échec du script reCAPTCHA, on laisse le serveur décider
+    }
+
     try {
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, recaptchaToken }),
       })
       const data = await res.json().catch(() => ({}))
 
@@ -145,6 +181,14 @@ export default function ContactClient() {
               <button className="btn btn-primary" type="submit" disabled={status === "sending"} style={{ alignSelf: "flex-start" }}>
                 {status === "sending" ? "Envoi en cours..." : "Envoyer le message"}
               </button>
+              {SITE_KEY && (
+                <p style={{ margin: 0, fontSize: "0.74rem", color: "var(--ink-mute)", lineHeight: 1.5 }}>
+                  Ce formulaire est protégé par reCAPTCHA —{" "}
+                  <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" style={{ color: "inherit" }}>Confidentialité</a>
+                  {" & "}
+                  <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer" style={{ color: "inherit" }}>CGU</a> Google.
+                </p>
+              )}
             </form>
           </div>
 

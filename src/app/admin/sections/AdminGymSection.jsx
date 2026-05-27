@@ -1,10 +1,25 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import Icon from '@/components/ui/Icon'
 import { createClient } from '@/lib/supabase-client'
 
 const DAYS = ["lundi","mardi","mercredi","jeudi","vendredi","samedi"]
 const DISCS = ["pilates","yoga","stretch","senior","renfo","step","fitball","pound","low","tendance"]
+
+function mapCourse(c) {
+  return {
+    id: c.id,
+    jour: c.jour,
+    heureDebut: c.heure_debut,
+    heureFin: c.heure_fin,
+    discipline: c.discipline,
+    animateur: c.animateur,
+    salle: c.salle,
+    niveau: c.niveau,
+    actif: c.actif,
+    disc: c.disc,
+  }
+}
 
 function Modal({ title, onClose, children }) {
   return (
@@ -54,31 +69,32 @@ export default function AdminGymSection() {
   const [editing, setEditing] = useState(null)
   const [fd, setFd] = useState("all")
   const [fdDisc, setFdDisc] = useState("all")
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
-  const fetchCourses = async () => {
+  const fetchCourses = useCallback(async () => {
     const { data, error } = await supabase
       .from('gym_courses')
       .select('*')
       .order('jour')
     if (!error) {
-      setItems(data.map(c => ({
-        id: c.id,
-        jour: c.jour,
-        heureDebut: c.heure_debut,
-        heureFin: c.heure_fin,
-        discipline: c.discipline,
-        animateur: c.animateur,
-        salle: c.salle,
-        niveau: c.niveau,
-        actif: c.actif,
-        disc: c.disc,
-      })))
+      setItems(data.map(mapCourse))
     }
     setLoading(false)
-  }
+  }, [supabase])
 
-  useEffect(() => { fetchCourses() }, [])
+  useEffect(() => {
+    let ignore = false
+    supabase
+      .from('gym_courses')
+      .select('*')
+      .order('jour')
+      .then(({ data, error }) => {
+        if (ignore) return
+        if (!error) setItems(data.map(mapCourse))
+        setLoading(false)
+      })
+    return () => { ignore = true }
+  }, [supabase])
 
   const save = async (item) => {
     const payload = {
@@ -113,6 +129,14 @@ export default function AdminGymSection() {
   }
 
   const disciplines = [...new Set(items.map(i => i.discipline))].sort()
+  const dayCounts = DAYS.reduce((acc, day) => {
+    acc[day] = items.filter(i => i.jour === day).length
+    return acc
+  }, {})
+  const disciplineCounts = disciplines.reduce((acc, discipline) => {
+    acc[discipline] = items.filter(i => i.discipline === discipline).length
+    return acc
+  }, {})
 
   const filtered = items
     .filter(i => fd === "all" || i.jour === fd)
@@ -139,16 +163,33 @@ export default function AdminGymSection() {
         </div>
       </div>
 
-      <div style={{ display: "flex", gap: 8, marginBottom: 10, flexWrap: "wrap" }}>
-        <button className={`chip ${fd === "all" ? "active" : ""}`} onClick={() => setFd("all")}>Tous les jours</button>
-        {DAYS.map(d => <button key={d} className={`chip ${fd === d ? "active" : ""}`} onClick={() => setFd(d)} style={{ textTransform: "capitalize" }}>{d}</button>)}
-      </div>
-
-      <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
-        <button className={`chip ${fdDisc === "all" ? "active" : ""}`} onClick={() => setFdDisc("all")}>Toutes les disciplines</button>
-        {disciplines.map(d => (
-          <button key={d} className={`chip ${fdDisc === d ? "active" : ""}`} onClick={() => setFdDisc(d)}>{d}</button>
-        ))}
+      <div className="admin-filter-panel">
+        <div className="admin-filter-row">
+          <div className="admin-filter-label">Jour</div>
+          <div className="admin-filter-options" role="group" aria-label="Filtrer par jour">
+            <button className={`admin-filter-chip ${fd === "all" ? "active" : ""}`} onClick={() => setFd("all")} aria-pressed={fd === "all"}>
+              Tous <span>{items.length}</span>
+            </button>
+            {DAYS.map(d => (
+              <button key={d} className={`admin-filter-chip ${fd === d ? "active" : ""}`} onClick={() => setFd(d)} aria-pressed={fd === d}>
+                <span className="admin-filter-cap">{d}</span> <span>{dayCounts[d] ?? 0}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="admin-filter-row">
+          <div className="admin-filter-label">Discipline</div>
+          <div className="admin-filter-options" role="group" aria-label="Filtrer par discipline">
+            <button className={`admin-filter-chip ${fdDisc === "all" ? "active" : ""}`} onClick={() => setFdDisc("all")} aria-pressed={fdDisc === "all"}>
+              Toutes <span>{items.length}</span>
+            </button>
+            {disciplines.map(d => (
+              <button key={d} className={`admin-filter-chip ${fdDisc === d ? "active" : ""}`} onClick={() => setFdDisc(d)} aria-pressed={fdDisc === d}>
+                {d} <span>{disciplineCounts[d] ?? 0}</span>
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
       <table className="tbl">

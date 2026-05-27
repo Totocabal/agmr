@@ -85,6 +85,7 @@ export async function getBureau() {
     id: b.id,
     nom: b.nom,
     role: b.role,
+    photo_url: b.photo_url ?? null,
   }))
 }
 
@@ -276,6 +277,34 @@ export async function updateSiteStat(id, valeur, label) {
     .eq('id', id)
   if (error) { console.error(error); return false }
   return true
+}
+
+// ── Nordique page blocks ─────────────────────────────────────
+export async function getNordiquePageBlocks() {
+  const { data, error } = await supabase.from('nordique_page_blocks').select('*').order('ordre')
+  if (error) { console.error(error); return [] }
+  return data
+}
+
+// ── Santé page blocks ────────────────────────────────────────
+export async function getSantePageBlocks() {
+  const { data, error } = await supabase.from('sante_page_blocks').select('*').order('ordre')
+  if (error) { console.error(error); return [] }
+  return data
+}
+
+// ── Asso page blocks ─────────────────────────────────────────
+export async function getAssoPageBlocks() {
+  const { data, error } = await supabase.from('asso_page_blocks').select('*').order('ordre')
+  if (error) { console.error(error); return [] }
+  return data
+}
+
+// ── AG documents ─────────────────────────────────────────────
+export async function getAGDocuments() {
+  const { data, error } = await supabase.from('ag_documents').select('*').order('saison', { ascending: false }).order('ordre')
+  if (error) { console.error(error); return [] }
+  return data
 }
 
 // ── Rando page blocks ────────────────────────────────────────

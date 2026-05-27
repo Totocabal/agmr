@@ -13,6 +13,11 @@ import AdminGalerieSection from './sections/AdminGalerieSection'
 import AdminHomeSection from './sections/AdminHomeSection'
 import AdminGymPageSection from './sections/AdminGymPageSection'
 import AdminRandoPageSection from './sections/AdminRandoPageSection'
+import AdminNordiquePageSection from './sections/AdminNordiquePageSection'
+import AdminSantePageSection from './sections/AdminSantePageSection'
+import AdminAssoPageSection from './sections/AdminAssoPageSection'
+import AdminComiteSection from './sections/AdminComiteSection'
+import AdminAGSection from './sections/AdminAGSection'
 
 // ── Sidebar ───────────────────────────────────────────────────
 function AdminSidebar({ section, setSection, user }) {
@@ -21,17 +26,21 @@ function AdminSidebar({ section, setSection, user }) {
     { id: "dash",       label: "Tableau de bord",   icon: "home" },
     { divider: "Activités" },
     { id: "home",       label: "Page principale",   icon: "file" },
-    { id: "gym-page",   label: "Page Gym",          icon: "leaf" },
-    { id: "gym",        label: "Planning Gym",      icon: "calendar" },
-    { id: "rando-page", label: "Page Randonnée",    icon: "mountain" },
-    { id: "rando",      label: "Planning Rando",    icon: "mountain" },
+    { id: "gym-page",      label: "Page Gym",           icon: "leaf" },
+    { id: "gym",           label: "Planning Gym",       icon: "calendar" },
+    { id: "rando-page",    label: "Page Randonnée",     icon: "mountain" },
+    { id: "rando",         label: "Planning Rando",     icon: "mountain" },
+    { id: "nordique-page", label: "Marche nordique",    icon: "leaf" },
+    { id: "sante-page",    label: "Santé par le sport", icon: "accessibility" },
     { divider: "Contenus" },
-    { id: "sejours",    label: "Séjours",           icon: "pin" },
-    { id: "actu",       label: "Actualités",        icon: "file" },
-    { id: "galerie",    label: "Galerie",           icon: "image" },
+    { id: "sejours",       label: "Séjours",            icon: "pin" },
+    { id: "actu",          label: "Actualités",         icon: "file" },
+    { id: "galerie",       label: "Galerie",            icon: "image" },
     { divider: "Association" },
-    { id: "comite",     label: "Comité directeur",  icon: "user" },
-    { id: "tarifs",     label: "Tarifs",            icon: "file" },
+    { id: "asso-page",     label: "Présentation",       icon: "file" },
+    { id: "comite",        label: "Comité directeur",   icon: "user" },
+    { id: "ag",            label: "Assemblée générale", icon: "file" },
+    { id: "tarifs",        label: "Tarifs",             icon: "file" },
     { divider: "" },
     { id: "settings",   label: "Paramètres",        icon: "settings" },
   ]
@@ -569,11 +578,15 @@ export default function AdminApp({ user }) {
           {section === "actu"     && <AdminActuSection/>}
           {section === "galerie"  && <AdminGalerieSection/>}
           {section === "home"     && <AdminHomeSection/>}
-          {section === "gym-page"   && <AdminGymPageSection/>}
-          {section === "rando-page" && <AdminRandoPageSection/>}
-          {section === "comite"     && <AdminComite/>}
-          {section === "tarifs"   && <AdminTarifs/>}
-          {section === "settings" && <AdminSettings user={user}/>}
+          {section === "gym-page"      && <AdminGymPageSection/>}
+          {section === "rando-page"    && <AdminRandoPageSection/>}
+          {section === "nordique-page" && <AdminNordiquePageSection/>}
+          {section === "sante-page"    && <AdminSantePageSection/>}
+          {section === "asso-page"     && <AdminAssoPageSection/>}
+          {section === "comite"        && <AdminComiteSection/>}
+          {section === "ag"            && <AdminAGSection/>}
+          {section === "tarifs"        && <AdminTarifs/>}
+          {section === "settings"      && <AdminSettings user={user}/>}
         </div>
       </div>
     </>

@@ -1,10 +1,12 @@
 import Header from '@/components/shell/Header'
 import Footer from '@/components/shell/Footer'
-import { bureau, animators } from '@/data'
+import { getBureau, getGymAnimateurs } from '@/lib/queries'
 
 export const metadata = { title: 'Comité Directeur — AGMR' }
 
-export default function ComitePage() {
+export default async function ComitePage() {
+  const [bureau, animateurs] = await Promise.all([getBureau(), getGymAnimateurs()])
+
   return (
     <div className="page-shell">
       <Header/>
@@ -23,10 +25,13 @@ export default function ComitePage() {
 
             <h2 style={{ fontSize: "2rem", marginBottom: 28 }}>Le bureau</h2>
             <div className="team-grid" style={{ marginBottom: 64 }}>
-              {bureau.map((b, i) => (
-                <div key={i} className="team-card">
-                  <div className={`team-photo team-photo-${"abcdefgh"[i % 8]}`}>
-                    <div className="team-photo-initial">{b.nom[0]}</div>
+              {bureau.map(b => (
+                <div key={b.id} className="team-card">
+                  <div
+                    className="team-photo"
+                    style={b.photo_url ? { backgroundImage: `url(${b.photo_url})`, backgroundSize: "cover", backgroundPosition: "center" } : undefined}
+                  >
+                    {!b.photo_url && <div className="team-photo-initial">{b.nom.charAt(0)}</div>}
                   </div>
                   <div className="team-body">
                     <div className="team-name">{b.nom}</div>
@@ -36,21 +41,28 @@ export default function ComitePage() {
               ))}
             </div>
 
-            <h2 style={{ fontSize: "2rem", marginBottom: 28 }}>Les animateurs</h2>
-            <div className="team-grid">
-              {animators.map((a, i) => (
-                <div key={i} className="team-card">
-                  <div className={`team-photo team-photo-${a.photo}`}>
-                    <div className="team-photo-initial">{a.initial}</div>
-                  </div>
-                  <div className="team-body">
-                    <div className="team-name">{a.nom}</div>
-                    <div className="team-role">{a.role}</div>
-                    <div className="team-disc">{a.disciplines}</div>
-                  </div>
+            {animateurs.length > 0 && (
+              <>
+                <h2 style={{ fontSize: "2rem", marginBottom: 28 }}>Les animateurs</h2>
+                <div className="team-grid">
+                  {animateurs.map(a => (
+                    <div key={a.id} className="team-card">
+                      <div
+                        className="team-photo"
+                        style={a.photo_url ? { backgroundImage: `url(${a.photo_url})`, backgroundSize: "cover", backgroundPosition: "center" } : undefined}
+                      >
+                        {!a.photo_url && <div className="team-photo-initial">{a.nom?.charAt(0)?.toUpperCase() ?? '?'}</div>}
+                      </div>
+                      <div className="team-body">
+                        <div className="team-name">{a.nom}</div>
+                        <div className="team-role">{a.role}</div>
+                        {a.disciplines && <div className="team-disc">{a.disciplines}</div>}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </>
+            )}
 
           </div>
         </section>

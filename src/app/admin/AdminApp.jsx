@@ -471,17 +471,6 @@ function AdminSettings({ user }) {
           <div className="field"><label>Mot de passe</label><input type="password" defaultValue="••••••••" readOnly/></div>
           <button className="btn btn-ghost" style={{ alignSelf: "flex-start" }}>Modifier le mot de passe</button>
         </div>
-        <hr style={{ border: "none", borderTop: "1px solid var(--line)", margin: "28px 0" }}/>
-        <h3 style={{ marginBottom: 12, fontFamily: "var(--sans)", fontSize: "1.1rem", fontWeight: 700 }}>État du projet</h3>
-        <div style={{ fontSize: "0.9rem", color: "var(--ink-soft)", lineHeight: 2, padding: "16px 20px", background: "var(--bg)", borderRadius: "var(--r-sm)", border: "1px dashed var(--line-strong)" }}>
-          <div>✅ Phase 1 — Pages publiques</div>
-          <div>✅ Phase 2 — Backoffice</div>
-          <div>✅ Phase 3 — Supabase (lecture)</div>
-          <div>✅ Phase 4 — Auth Supabase</div>
-          <div>⏳ Phase 5 — CRUD branché Supabase</div>
-          <div>⏳ Phase 6 — Storage photos</div>
-          <div>⏳ Phase 7 — Déploiement Vercel</div>
-        </div>
       </div>
     </>
   )

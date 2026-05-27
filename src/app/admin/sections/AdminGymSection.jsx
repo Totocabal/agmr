@@ -18,6 +18,8 @@ function mapCourse(c) {
     niveau: c.niveau,
     actif: c.actif,
     disc: c.disc,
+    complet: c.complet ?? false,
+    tag: c.tag ?? '',
   }
 }
 
@@ -107,6 +109,8 @@ export default function AdminGymSection() {
       niveau: item.niveau,
       actif: item.actif,
       disc: item.disc,
+      complet: item.complet ?? false,
+      tag: item.tag || null,
     }
     if (item.id) {
       await supabase.from('gym_courses').update(payload).eq('id', item.id)
@@ -142,7 +146,7 @@ export default function AdminGymSection() {
     .filter(i => fd === "all" || i.jour === fd)
     .filter(i => fdDisc === "all" || i.discipline === fdDisc)
 
-  const blank = { jour: "lundi", heureDebut: "09:00", heureFin: "10:00", discipline: "", animateur: "", salle: "", niveau: "tous", actif: true, disc: "pilates" }
+  const blank = { jour: "lundi", heureDebut: "09:00", heureFin: "10:00", discipline: "", animateur: "", salle: "", niveau: "tous", actif: true, disc: "pilates", complet: false, tag: '' }
 
   if (loading) return <div style={{ padding: 40, color: "var(--ink-mute)" }}>Chargement...</div>
 
@@ -193,15 +197,19 @@ export default function AdminGymSection() {
       </div>
 
       <table className="tbl">
-        <thead><tr><th>Jour</th><th>Heure</th><th>Discipline</th><th>Animateur</th><th>Salle</th><th>Actif</th><th></th></tr></thead>
+        <thead><tr><th>Jour</th><th>Heure</th><th>Discipline</th><th>Animateur</th><th>Salle</th><th>Tag</th><th>Actif</th><th></th></tr></thead>
         <tbody>
           {filtered.map(c => (
             <tr key={c.id} style={{ opacity: c.actif ? 1 : 0.5 }}>
               <td style={{ textTransform: "capitalize" }}>{c.jour}</td>
               <td style={{ whiteSpace: "nowrap" }}>{c.heureDebut} – {c.heureFin}</td>
-              <td><strong>{c.discipline}</strong></td>
+              <td><strong>{c.discipline}</strong>{c.complet && <span style={{ marginLeft: 6, fontSize: "0.72rem", background: "#dc2626", color: "#fff", borderRadius: 4, padding: "1px 5px" }}>Complet</span>}</td>
               <td>{c.animateur}</td>
               <td>{c.salle}</td>
+              <td style={{ whiteSpace: "nowrap" }}>
+                {c.tag === 'nouveau' && <span style={{ fontSize: "0.72rem", background: "#0891b2", color: "#fff", borderRadius: 4, padding: "1px 5px" }}>Nouveau</span>}
+                {c.tag === 'apa' && <span style={{ fontSize: "0.72rem", background: "#ca8a04", color: "#fff", borderRadius: 4, padding: "1px 5px" }}>APA</span>}
+              </td>
               <td><button className={`switch ${c.actif ? "on" : ""}`} onClick={() => tog(c.id, c.actif)}/></td>
               <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
                 <button className="icon-btn" onClick={() => setEditing(c)}><Icon name="edit" size={14}/></button>
@@ -210,7 +218,7 @@ export default function AdminGymSection() {
             </tr>
           ))}
           {filtered.length === 0 && (
-            <tr><td colSpan={7} style={{ textAlign: "center", color: "var(--ink-mute)", padding: 32 }}>Aucun créneau pour cette sélection</td></tr>
+            <tr><td colSpan={8} style={{ textAlign: "center", color: "var(--ink-mute)", padding: 32 }}>Aucun créneau pour cette sélection</td></tr>
           )}
         </tbody>
       </table>
@@ -253,14 +261,28 @@ function GymForm({ item, onSave, onCancel }) {
         <div className="field"><label>Animateur</label><input value={f.animateur} onChange={e => u("animateur", e.target.value)}/></div>
         <div className="field"><label>Salle</label><input value={f.salle} onChange={e => u("salle", e.target.value)}/></div>
       </div>
-      <div className="field"><label>Couleur (disc)</label>
-        <select value={f.disc} onChange={e => u("disc", e.target.value)}>
-          {DISCS.map(d => <option key={d} value={d}>{d}</option>)}
-        </select>
+      <div className="row-2">
+        <div className="field"><label>Couleur (disc)</label>
+          <select value={f.disc} onChange={e => u("disc", e.target.value)}>
+            {DISCS.map(d => <option key={d} value={d}>{d}</option>)}
+          </select>
+        </div>
+        <div className="field"><label>Tag</label>
+          <select value={f.tag ?? ''} onChange={e => u("tag", e.target.value)}>
+            <option value="">— Aucun —</option>
+            <option value="nouveau">Nouveau</option>
+            <option value="apa">APA</option>
+          </select>
+        </div>
       </div>
-      <label style={{ display: "flex", gap: 10, alignItems: "center", fontSize: "0.92rem" }}>
-        <input type="checkbox" checked={f.actif} onChange={e => u("actif", e.target.checked)}/> Créneau actif
-      </label>
+      <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
+        <label style={{ display: "flex", gap: 10, alignItems: "center", fontSize: "0.92rem" }}>
+          <input type="checkbox" checked={f.actif} onChange={e => u("actif", e.target.checked)}/> Créneau actif
+        </label>
+        <label style={{ display: "flex", gap: 10, alignItems: "center", fontSize: "0.92rem" }}>
+          <input type="checkbox" checked={f.complet ?? false} onChange={e => u("complet", e.target.checked)}/> Complet
+        </label>
+      </div>
       <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 8 }}>
         <button className="btn btn-ghost" onClick={onCancel}>Annuler</button>
         <button className="btn btn-primary" onClick={() => onSave(f)}>Enregistrer</button>

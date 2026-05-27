@@ -181,9 +181,14 @@ export default function PlanningGymClient({ courses }) {
                 </div>
                 <div className="gym-day-body">
                   {slots.map(s => (
-                    <div key={s.id} className={`gym-slot disc-${s.disc}`}>
+                    <div key={s.id} className={`gym-slot disc-${s.disc}${s.complet ? ' complet' : ''}`}>
                       <div className="gym-slot-time">{s.heureDebut} – {s.heureFin}</div>
-                      <div className="gym-slot-disc">{s.discipline}</div>
+                      <div className="gym-slot-disc">
+                        {s.discipline}
+                        {s.complet && <span className="slot-badge badge-complet">Complet</span>}
+                        {s.tag === 'nouveau' && <span className="slot-badge badge-nouveau">Nouveau</span>}
+                        {s.tag === 'apa' && <span className="slot-badge badge-apa">APA</span>}
+                      </div>
                       <div className="gym-slot-meta">{s.animateur} · {s.salle}</div>
                     </div>
                   ))}

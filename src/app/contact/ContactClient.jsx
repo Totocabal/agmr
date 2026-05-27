@@ -2,8 +2,6 @@
 import { useState } from 'react'
 import Icon from '@/components/ui/Icon'
 
-const TEST_CONTACT_EMAIL = 'tho.chevalier@gmail.com'
-
 export default function ContactClient() {
   const [form, setForm] = useState({ prenom: "", nom: "", email: "", sujet: "Inscription", message: "", website: "" })
   const [status, setStatus] = useState("idle")
@@ -18,6 +16,7 @@ export default function ContactClient() {
 
   const submit = async (e) => {
     e.preventDefault()
+    setStatus("sending")
     setFeedback("")
 
     if (!form.prenom.trim() || !form.nom.trim() || !form.email.trim() || !form.message.trim()) {
@@ -32,20 +31,25 @@ export default function ContactClient() {
       return
     }
 
-    const subject = `[AGMR] ${form.sujet} - ${form.prenom} ${form.nom}`
-    const body = [
-      `Prénom : ${form.prenom}`,
-      `Nom : ${form.nom}`,
-      `Email : ${form.email}`,
-      `Sujet : ${form.sujet}`,
-      '',
-      'Message :',
-      form.message,
-    ].join('\n')
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      })
+      const data = await res.json().catch(() => ({}))
 
-    window.location.href = `mailto:${TEST_CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
-    setStatus("success")
-    setFeedback(`Votre message est prêt dans votre logiciel mail, adressé à ${TEST_CONTACT_EMAIL}.`)
+      if (!res.ok || data.ok === false) {
+        throw new Error(data.error || "Le message n'a pas pu être envoyé.")
+      }
+
+      setForm({ prenom: "", nom: "", email: "", sujet: "Inscription", message: "", website: "" })
+      setStatus("success")
+      setFeedback("Votre message a bien été envoyé. Nous vous répondrons rapidement.")
+    } catch (error) {
+      setStatus("error")
+      setFeedback(error.message || "Le message n'a pas pu être envoyé.")
+    }
   }
 
   return (

@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js'
+import { getResend } from '@/lib/resend'
 
 const SUBJECTS = new Set([
   'Inscription',
@@ -15,6 +15,15 @@ function clean(value, maxLength) {
 
 function jsonError(message, status = 400) {
   return Response.json({ ok: false, error: message }, { status })
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;')
 }
 
 export async function POST(request) {
@@ -48,33 +57,51 @@ export async function POST(request) {
     return jsonError('Merci de choisir un sujet valide.')
   }
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  const apiKey = process.env.RESEND_API_KEY
+  const to = process.env.CONTACT_TO_EMAIL || 'tho.chevalier@gmail.com'
+  const from = process.env.RESEND_FROM_EMAIL || 'AGMR <onboarding@resend.dev>'
 
-  if (!supabaseUrl || !supabaseAnonKey) {
-    return jsonError('Configuration Supabase manquante.', 500)
+  if (!apiKey) {
+    return jsonError('Configuration Resend manquante.', 500)
   }
 
-  const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false,
-    },
-  })
-
-  const { error } = await supabase.from('contact_messages').insert({
-    prenom,
-    nom,
-    email,
-    sujet,
+  const fullName = `${prenom} ${nom}`
+  const emailSubject = `[AGMR] ${sujet} - ${fullName}`
+  const text = [
+    `Nouveau message depuis le formulaire de contact AGMR`,
+    '',
+    `Prénom : ${prenom}`,
+    `Nom : ${nom}`,
+    `Email : ${email}`,
+    `Sujet : ${sujet}`,
+    '',
+    'Message :',
     message,
-    source: 'site_web',
-    user_agent: request.headers.get('user-agent') ?? null,
+  ].join('\n')
+  const html = `
+    <div style="font-family: Arial, sans-serif; color: #1a2317; line-height: 1.5;">
+      <h1 style="font-size: 20px; margin: 0 0 16px;">Nouveau message AGMR</h1>
+      <p><strong>Prénom :</strong> ${escapeHtml(prenom)}</p>
+      <p><strong>Nom :</strong> ${escapeHtml(nom)}</p>
+      <p><strong>Email :</strong> <a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></p>
+      <p><strong>Sujet :</strong> ${escapeHtml(sujet)}</p>
+      <hr style="border: 0; border-top: 1px solid #ddd2b8; margin: 20px 0;" />
+      <p style="white-space: pre-line;">${escapeHtml(message)}</p>
+    </div>
+  `
+
+  const { data, error } = await getResend().emails.send({
+    from,
+    to,
+    replyTo: email,
+    subject: emailSubject,
+    text,
+    html,
   })
 
   if (error) {
-    return jsonError("Le message n'a pas pu être envoyé. Réessayez dans un instant.", 500)
+    return jsonError(error.message || "Le message n'a pas pu être envoyé. Réessayez dans un instant.", 500)
   }
 
-  return Response.json({ ok: true })
+  return Response.json({ ok: true, id: data?.id ?? null })
 }

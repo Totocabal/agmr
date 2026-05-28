@@ -69,6 +69,17 @@ function recurrenceLabel(rec, jour) {
   }
 }
 
+// ── Vacation helpers ───────────────────────────────────────────
+function getVacationForDay(date, vacances) {
+  // Noon local time avoids timezone edge cases
+  const d = new Date(date); d.setHours(12, 0, 0, 0)
+  return vacances.find(v => {
+    const s = new Date(v.dateDebut + 'T00:00:00')
+    const e = new Date(v.dateFin   + 'T23:59:59')
+    return d >= s && d <= e
+  }) ?? null
+}
+
 function recurrenceBadge(rec) {
   if (!rec || rec.type === 'weekly') return null
   switch (rec.type) {
@@ -185,7 +196,7 @@ function DiscDropdown({ disciplines, selected, onChange }) {
 }
 
 // ── Main ───────────────────────────────────────────────────────
-export default function PlanningGymClient({ courses }) {
+export default function PlanningGymClient({ courses, vacances = [] }) {
   const [weekOffset, setWeekOffset] = useState(0)
   const [selected, setSelected]     = useState(new Set())
   const [clickedId, setClickedId]   = useState(null)
@@ -240,6 +251,22 @@ export default function PlanningGymClient({ courses }) {
           </button>
         </div>
 
+        {/* ── Bannière vacances si la semaine est concernée ── */}
+        {(() => {
+          const vacNames = [...new Set(
+            DAYS.map((_, di) => {
+              const d = new Date(monday); d.setDate(d.getDate() + di)
+              return getVacationForDay(d, vacances)?.nom
+            }).filter(Boolean)
+          )]
+          return vacNames.length > 0 ? (
+            <div style={{ margin: '12px 0 0', padding: '10px 16px', background: '#fef9ec', border: '1px solid #f0d060', borderRadius: 'var(--r-sm)', display: 'flex', alignItems: 'center', gap: 10, fontSize: '0.88rem', color: '#7a6010' }}>
+              <span style={{ fontSize: '1rem' }}>🏖️</span>
+              <span><strong>Vacances scolaires</strong> — {vacNames.join(' · ')} · Pas de cours cette semaine.</span>
+            </div>
+          ) : null
+        })()}
+
         {/* ── Calendar grid ── */}
         <div className="planning-time-grid" style={{ border: '1px solid var(--line)', borderRadius: 'var(--r-md)', overflow: 'hidden', background: 'var(--bg-card)', marginTop: 20 }}>
 
@@ -249,15 +276,21 @@ export default function PlanningGymClient({ courses }) {
             {DAYS.map((day, di) => {
               const date = new Date(monday)
               date.setDate(date.getDate() + di)
-              const isToday = date.toDateString() === todayStr
+              const isToday   = date.toDateString() === todayStr
+              const vacation  = getVacationForDay(date, vacances)
               return (
-                <div key={day} style={{ padding: '10px 6px', textAlign: 'center', borderLeft: '1px solid var(--line)' }}>
-                  <div style={{ fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: isToday ? 'var(--accent)' : 'var(--ink-mute)', fontWeight: 600, marginBottom: 4 }}>
+                <div key={day} style={{ padding: '10px 6px', textAlign: 'center', borderLeft: '1px solid var(--line)', background: vacation ? 'rgba(0,0,0,0.03)' : 'transparent' }}>
+                  <div style={{ fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: vacation ? 'var(--ink-mute)' : isToday ? 'var(--accent)' : 'var(--ink-mute)', fontWeight: 600, marginBottom: 4, opacity: vacation ? 0.5 : 1 }}>
                     {day}
                   </div>
-                  <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: '50%', background: isToday ? 'var(--accent)' : 'transparent', color: isToday ? '#fff' : 'var(--ink)', fontSize: '0.9rem', fontWeight: isToday ? 700 : 400 }}>
+                  <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: '50%', background: vacation ? 'transparent' : isToday ? 'var(--accent)' : 'transparent', color: vacation ? 'var(--ink-mute)' : isToday ? '#fff' : 'var(--ink)', fontSize: '0.9rem', fontWeight: isToday ? 700 : 400, opacity: vacation ? 0.45 : 1 }}>
                     {date.getDate()}
                   </div>
+                  {vacation && (
+                    <div style={{ fontSize: '0.58rem', marginTop: 4, color: '#8a7020', background: '#fef9ec', borderRadius: 3, padding: '1px 4px', display: 'inline-block' }}>
+                      vacances
+                    </div>
+                  )}
                 </div>
               )
             })}
@@ -291,10 +324,11 @@ export default function PlanningGymClient({ courses }) {
 
               {/* Day columns */}
               {DAYS.map((day, di) => {
-                const date = new Date(monday)
+                const date    = new Date(monday)
                 date.setDate(date.getDate() + di)
-                const isToday = date.toDateString() === todayStr
-                const laid    = laidByDay[day] ?? []
+                const isToday  = date.toDateString() === todayStr
+                const vacation = getVacationForDay(date, vacances)
+                const laid     = vacation ? [] : (laidByDay[day] ?? [])
 
                 return (
                   <div key={day}
@@ -303,10 +337,23 @@ export default function PlanningGymClient({ courses }) {
                       position: 'relative',
                       height: GRID_H,
                       borderLeft: di > 0 ? '1px solid var(--line)' : 'none',
-                      background: isToday ? 'rgba(52,90,60,0.025)' : 'transparent',
+                      background: vacation
+                        ? 'repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(0,0,0,0.018) 8px, rgba(0,0,0,0.018) 16px)'
+                        : isToday ? 'rgba(52,90,60,0.025)' : 'transparent',
                       overflow: 'visible',
                       zIndex: laid.some(s => s.id === clickedId) ? 10 : 'auto',
                     }}>
+
+                    {/* Overlay vacances */}
+                    {vacation && (
+                      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, pointerEvents: 'none', zIndex: 3 }}>
+                        <span style={{ fontSize: '1.4rem', opacity: 0.4 }}>🏖️</span>
+                        <span style={{ fontSize: '0.65rem', color: 'var(--ink-mute)', opacity: 0.6, textAlign: 'center', lineHeight: 1.4, padding: '0 4px' }}>
+                          {vacation.nom}
+                        </span>
+                      </div>
+                    )}
+
                     {laid.map(s => {
                       const top   = slotTop(s.heureDebut)
                       const baseH = Math.max(slotHeight(s.heureDebut, s.heureFin), 18)

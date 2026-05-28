@@ -362,6 +362,22 @@ export async function getGymAnimateurs() {
   return data
 }
 
+// ── Vacances scolaires ───────────────────────────────────────
+export async function getVacances() {
+  const { data, error } = await supabase
+    .from('vacances_scolaires')
+    .select('*')
+    .order('date_debut')
+  if (error) { console.error(error); return [] }
+  return data.map(v => ({
+    id: v.id,
+    nom: v.nom,
+    dateDebut: v.date_debut,
+    dateFin: v.date_fin,
+    zone: v.zone,
+  }))
+}
+
 export async function getGaleriePhotos() {
   const { data, error } = await supabase
     .from('galerie_photos')

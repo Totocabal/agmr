@@ -19,6 +19,7 @@ import AdminAssoPageSection from './sections/AdminAssoPageSection'
 import AdminComiteSection from './sections/AdminComiteSection'
 import AdminAGSection from './sections/AdminAGSection'
 import AdminAccessSection from './sections/AdminAccessSection'
+import AdminVacancesSection from './sections/AdminVacancesSection'
 
 // ── Sidebar ───────────────────────────────────────────────────
 function AdminSidebar({ section, setSection, user, canAccess, isSuperAdmin }) {
@@ -30,6 +31,7 @@ function AdminSidebar({ section, setSection, user, canAccess, isSuperAdmin }) {
     { id: "home",          label: "Page principale",    icon: "file" },
     { id: "gym-page",      label: "Page Gym",           icon: "leaf" },
     { id: "gym",           label: "Planning Gym",       icon: "calendar" },
+    { id: "vacances",      label: "Vacances scolaires", icon: "calendar" },
     { id: "rando-page",    label: "Page Randonnée",     icon: "mountain" },
     { id: "rando",         label: "Planning Rando",     icon: "mountain" },
     { id: "nordique-page", label: "Marche nordique",    icon: "leaf" },
@@ -604,6 +606,7 @@ export default function AdminApp({ user, profile }) {
         <div className="admin-main">
           {section === "dash"          && <Dashboard setSection={setSection}/>}
           {section === "gym"           && canAccess("gym")           && <AdminGymSection/>}
+          {section === "vacances"      && canAccess("gym")           && <AdminVacancesSection/>}
           {section === "rando"         && canAccess("rando")         && <AdminRandoSection/>}
           {section === "sejours"       && canAccess("sejours")       && <AdminSejours/>}
           {section === "actu"          && canAccess("actu")          && <AdminActuSection/>}

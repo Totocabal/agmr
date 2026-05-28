@@ -2,12 +2,12 @@ export const dynamic = 'force-dynamic'
 import Header from '@/components/shell/Header'
 import Footer from '@/components/shell/Footer'
 import PlanningGymClient from './PlanningGymClient'
-import { getGymCourses } from '@/lib/queries'
+import { getGymCourses, getVacances } from '@/lib/queries'
 
 export const metadata = { title: 'Planning Gym — AGMR' }
 
 export default async function PlanningGymPage() {
-  const courses = await getGymCourses()
+  const [courses, vacances] = await Promise.all([getGymCourses(), getVacances()])
   return (
     <div className="page-shell">
       <Header/>
@@ -20,7 +20,7 @@ export default async function PlanningGymPage() {
             <p className="page-header-lede">43 heures de cours par semaine dans 5 salles. Pas de cours pendant les vacances scolaires.</p>
           </div>
         </div>
-        <PlanningGymClient courses={courses}/>
+        <PlanningGymClient courses={courses} vacances={vacances}/>
       </main>
       <Footer/>
     </div>

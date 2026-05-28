@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import Icon from '@/components/ui/Icon'
 import { createClient } from '@/lib/supabase-client'
+import { logActivity } from '@/lib/activity'
 import { formatDateFR, catLabel } from '@/utils/format'
 
 function Modal({ title, onClose, children }) {
@@ -39,8 +40,10 @@ export default function AdminActuSection() {
     const payload = { cat: item.cat, date: item.date, title: item.title, excerpt: item.excerpt }
     if (item.id) {
       await supabase.from('actualites').update(payload).eq('id', item.id)
+      await logActivity(supabase, { message: `Article modifié — ${item.title}`, section: 'actu', action: 'update' })
     } else {
       await supabase.from('actualites').insert(payload)
+      await logActivity(supabase, { message: `Nouvel article publié — ${item.title}`, section: 'actu', action: 'create' })
     }
     setEditing(null)
     fetch()
@@ -48,7 +51,9 @@ export default function AdminActuSection() {
 
   const del = async (id) => {
     if (!confirm("Supprimer cet article ?")) return
+    const article = items.find(i => i.id === id)
     await supabase.from('actualites').delete().eq('id', id)
+    await logActivity(supabase, { message: `Article supprimé — ${article?.title ?? ''}`, section: 'actu', action: 'delete' })
     fetch()
   }
 

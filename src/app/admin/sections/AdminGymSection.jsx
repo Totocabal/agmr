@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import Icon from '@/components/ui/Icon'
 import { createClient } from '@/lib/supabase-client'
+import { logActivity } from '@/lib/activity'
 
 const DAYS = ["lundi","mardi","mercredi","jeudi","vendredi","samedi"]
 const DISCS = ["pilates","yoga","stretch","senior","renfo","step","fitball","pound","low","tendance"]
@@ -116,8 +117,10 @@ export default function AdminGymSection() {
     }
     if (item.id) {
       await supabase.from('gym_courses').update(payload).eq('id', item.id)
+      await logActivity(supabase, { message: `Cours modifié — ${item.discipline} ${item.jour} ${item.heureDebut}`, section: 'gym', action: 'update' })
     } else {
       await supabase.from('gym_courses').insert(payload)
+      await logActivity(supabase, { message: `Nouveau cours — ${item.discipline} ${item.jour} ${item.heureDebut}`, section: 'gym', action: 'create' })
     }
     setEditing(null)
     fetchCourses()
@@ -125,7 +128,9 @@ export default function AdminGymSection() {
 
   const del = async (id) => {
     if (!confirm("Supprimer ce créneau ?")) return
+    const course = items.find(i => i.id === id)
     await supabase.from('gym_courses').delete().eq('id', id)
+    await logActivity(supabase, { message: `Cours supprimé — ${course?.discipline ?? ''} ${course?.jour ?? ''}`, section: 'gym', action: 'delete' })
     fetchCourses()
   }
 

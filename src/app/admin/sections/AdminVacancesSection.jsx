@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import Icon from '@/components/ui/Icon'
 import { createClient } from '@/lib/supabase-client'
+import { logActivity } from '@/lib/activity'
 
 function Modal({ title, onClose, children }) {
   return (
@@ -48,15 +49,19 @@ export default function AdminVacancesSection() {
     const payload = { nom: f.nom, date_debut: f.date_debut, date_fin: f.date_fin, zone: f.zone || 'C' }
     if (f.id) {
       await supabase.from('vacances_scolaires').update(payload).eq('id', f.id)
+      await logActivity(supabase, { message: `Vacances modifiées — ${f.nom}`, section: 'vacances', action: 'update' })
     } else {
       await supabase.from('vacances_scolaires').insert(payload)
+      await logActivity(supabase, { message: `Vacances ajoutées — ${f.nom}`, section: 'vacances', action: 'create' })
     }
     setEditing(null); load()
   }
 
   const del = async (id) => {
     if (!confirm('Supprimer cette période de vacances ?')) return
+    const vac = items.find(i => i.id === id)
     await supabase.from('vacances_scolaires').delete().eq('id', id)
+    await logActivity(supabase, { message: `Vacances supprimées — ${vac?.nom ?? ''}`, section: 'vacances', action: 'delete' })
     load()
   }
 

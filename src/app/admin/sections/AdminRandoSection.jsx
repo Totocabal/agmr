@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import Icon from '@/components/ui/Icon'
 import { createClient } from '@/lib/supabase-client'
+import { logActivity } from '@/lib/activity'
 import { formatDateFR, labelType } from '@/utils/format'
 
 function Modal({ title, onClose, children }) {
@@ -66,8 +67,10 @@ export default function AdminRandoSection() {
     }
     if (item.id) {
       await supabase.from('rando_sorties').update(payload).eq('id', item.id)
+      await logActivity(supabase, { message: `Sortie modifiée — ${item.titre || item.type} du ${item.date}`, section: 'rando', action: 'update' })
     } else {
       await supabase.from('rando_sorties').insert(payload)
+      await logActivity(supabase, { message: `Nouvelle sortie — ${item.titre || item.type} du ${item.date}`, section: 'rando', action: 'create' })
     }
     setEditing(null)
     fetchData()
@@ -75,7 +78,9 @@ export default function AdminRandoSection() {
 
   const del = async (id) => {
     if (!confirm("Supprimer cette sortie ?")) return
+    const sortie = items.find(i => i.id === id)
     await supabase.from('rando_sorties').delete().eq('id', id)
+    await logActivity(supabase, { message: `Sortie supprimée — ${sortie?.titre || sortie?.type || ''} du ${sortie?.date || ''}`, section: 'rando', action: 'delete' })
     fetchData()
   }
 

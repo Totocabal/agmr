@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import Icon from '@/components/ui/Icon'
 import { createClient } from '@/lib/supabase-client'
+import { logActivity } from '@/lib/activity'
 
 const IMG_OPTIONS = {
   a: 'linear-gradient(135deg, #c4956a 0%, #8b5e3c 100%)',
@@ -55,20 +56,27 @@ export default function AdminSejoursSection() {
     }
     if (f.id) {
       await supabase.from('sejours').update(payload).eq('id', f.id)
+      await logActivity(supabase, { message: `Séjour modifié — ${f.titre}`, section: 'sejours', action: 'update' })
     } else {
       await supabase.from('sejours').insert(payload)
+      await logActivity(supabase, { message: `Nouveau séjour — ${f.titre}`, section: 'sejours', action: 'create' })
     }
     setEditing(null); load()
   }
 
   const del = async (id) => {
     if (!confirm('Supprimer ce séjour ?')) return
+    const sejour = items.find(i => i.id === id)
     await supabase.from('sejours').delete().eq('id', id)
+    await logActivity(supabase, { message: `Séjour supprimé — ${sejour?.titre ?? ''}`, section: 'sejours', action: 'delete' })
     load()
   }
 
   const setStatut = async (id, statut) => {
+    const sejour = items.find(i => i.id === id)
     await supabase.from('sejours').update({ statut }).eq('id', id)
+    const label = statut === 'complet' ? 'marqué complet' : statut === 'ouvert' ? 'rouvert' : 'terminé'
+    await logActivity(supabase, { message: `Séjour ${label} — ${sejour?.titre ?? ''}`, section: 'sejours', action: 'update' })
     load()
   }
 

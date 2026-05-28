@@ -6,6 +6,7 @@ import Icon from '@/components/ui/Icon'
 import { createClient } from '@/lib/supabase-client'
 import { gymCourses, randoSorties, news, sejours, bureau } from '@/data'
 import { formatDateFR, labelType, catLabel } from '@/utils/format'
+import { relativeTime } from '@/lib/activity'
 import AdminGymSection from './sections/AdminGymSection'
 import AdminActuSection from './sections/AdminActuSection'
 import AdminRandoSection from './sections/AdminRandoSection'
@@ -121,15 +122,17 @@ function AdminSidebar({ section, setSection, user, canAccess, isSuperAdmin }) {
 
 // ── Dashboard ─────────────────────────────────────────────────
 function Dashboard({ setSection }) {
-  const [kpi, setKpi] = useState(null)
+  const [kpi, setKpi]           = useState(null)
+  const [activity, setActivity] = useState(null)
   const supabase = createClient()
 
   useEffect(() => {
     async function load() {
-      const [gym, rando, sejours] = await Promise.all([
+      const [gym, rando, sejours, log] = await Promise.all([
         supabase.from('gym_courses').select('id', { count: 'exact' }).eq('actif', true),
         supabase.from('rando_sorties').select('date').gte('date', new Date().toISOString().slice(0,10)).eq('annule', false).order('date'),
         supabase.from('sejours').select('statut'),
+        supabase.from('activity_log').select('*').order('created_at', { ascending: false }).limit(8),
       ])
       const prochaine = rando.data?.[0]?.date
       const prochaineLabel = prochaine
@@ -142,6 +145,7 @@ function Dashboard({ setSection }) {
         [String(rando.data?.length ?? 0), "Sorties à venir", prochaineLabel],
         [String(sejoursTotal), "Séjours programmés", `${sejoursOuverts} ouvert${sejoursOuverts > 1 ? 's' : ''}`],
       ])
+      setActivity(log.data ?? [])
     }
     load()
   }, [])
@@ -165,9 +169,19 @@ function Dashboard({ setSection }) {
         <div style={{ background: "var(--bg-card)", border: "1px solid var(--line)", borderRadius: "var(--r-md)", padding: 24 }}>
           <h3 style={{ fontFamily: "var(--sans)", fontSize: "1.1rem", fontWeight: 700, marginBottom: 16 }}>Activité récente</h3>
           <ul style={{ listStyle: "none", padding: 0, margin: 0, fontSize: "0.94rem" }}>
-            {[["Virginie a modifié le cours du mardi 9h","il y a 2h"],["Pierre a marqué la rando du 04/06 complète","hier"],["Admin a publié Label Rando-Santé","15/04"],["Marie-Claire a uploadé 12 photos Séjour Alsace","22/05"]].map(([m,t],i) => (
-              <li key={i} style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid var(--line-soft)" }}>
-                <span>{m}</span><span className="muted" style={{ fontSize: "0.84rem", whiteSpace: "nowrap", marginLeft: 16 }}>{t}</span>
+            {activity === null && (
+              <li style={{ color: "var(--ink-mute)", padding: "10px 0" }}>Chargement…</li>
+            )}
+            {activity !== null && activity.length === 0 && (
+              <li style={{ color: "var(--ink-mute)", padding: "10px 0" }}>Aucune activité pour l'instant.</li>
+            )}
+            {(activity ?? []).map((a) => (
+              <li key={a.id} style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid var(--line-soft)" }}>
+                <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--ink-mute)", background: "var(--bg-deep)", borderRadius: 3, padding: "1px 5px", flexShrink: 0 }}>{a.section}</span>
+                  {a.message}
+                </span>
+                <span className="muted" style={{ fontSize: "0.84rem", whiteSpace: "nowrap", marginLeft: 16 }}>{relativeTime(a.created_at)}</span>
               </li>
             ))}
           </ul>

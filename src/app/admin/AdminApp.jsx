@@ -77,7 +77,7 @@ function AdminSidebar({ section, setSection, user, canAccess, isSuperAdmin }) {
   return (
     <aside className="admin-side">
       <div className="admin-side-brand">
-        <AGMRLogo size={38} light={true} withTagline={false}/>
+        <AGMRLogo size={52} light={true} withTagline={false}/>
         <div className="asb-text">
           <div className="asb-1">Admin</div>
           <div className="asb-2">Back-office</div>
@@ -555,9 +555,9 @@ function AdminSettings({ user }) {
 const ADMIN_CSS = `
 .admin-shell { display: grid; grid-template-columns: 248px 1fr; min-height: 100vh; background: var(--bg); }
 .admin-side { background: #0f1813; color: #d2cdbf; padding: 26px 0; position: sticky; top: 0; height: 100vh; overflow-y: auto; display: flex; flex-direction: column; }
-.admin-side-brand { padding: 0 24px 22px; border-bottom: 1px solid #1f2a23; margin-bottom: 14px; display: flex; align-items: center; gap: 12px; }
+.admin-side-brand { padding: 24px 24px 22px; border-bottom: 1px solid #1f2a23; margin-bottom: 14px; display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; }
 .asb-text .asb-1 { font-family: var(--serif); font-size: 1.4rem; color: #fff; font-weight: 600; line-height: 1; }
-.asb-text .asb-2 { font-size: 0.7rem; color: #8b9089; letter-spacing: 0.16em; text-transform: uppercase; margin-top: 4px; }
+.asb-text .asb-2 { font-size: 0.7rem; color: #8b9089; letter-spacing: 0.16em; text-transform: uppercase; margin-top: 5px; }
 .admin-side nav { display: flex; flex-direction: column; gap: 1px; }
 .admin-side nav a { padding: 11px 24px; color: #d2cdbf; text-decoration: none; font-size: 0.94rem; display: flex; align-items: center; gap: 12px; border-left: 3px solid transparent; cursor: pointer; }
 .admin-side nav a:hover { background: rgba(255,255,255,0.04); color: #fff; }

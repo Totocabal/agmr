@@ -20,6 +20,7 @@ import AdminComiteSection from './sections/AdminComiteSection'
 import AdminAGSection from './sections/AdminAGSection'
 import AdminAccessSection from './sections/AdminAccessSection'
 import AdminVacancesSection from './sections/AdminVacancesSection'
+import AdminSejoursSection from './sections/AdminSejoursSection'
 
 // ── Sidebar ───────────────────────────────────────────────────
 function AdminSidebar({ section, setSection, user, canAccess, isSuperAdmin }) {
@@ -608,7 +609,7 @@ export default function AdminApp({ user, profile }) {
           {section === "gym"           && canAccess("gym")           && <AdminGymSection/>}
           {section === "vacances"      && canAccess("gym")           && <AdminVacancesSection/>}
           {section === "rando"         && canAccess("rando")         && <AdminRandoSection/>}
-          {section === "sejours"       && canAccess("sejours")       && <AdminSejours/>}
+          {section === "sejours"       && canAccess("sejours")       && <AdminSejoursSection/>}
           {section === "actu"          && canAccess("actu")          && <AdminActuSection/>}
           {section === "galerie"       && canAccess("galerie")       && <AdminGalerieSection/>}
           {section === "home"          && canAccess("home")          && <AdminHomeSection/>}

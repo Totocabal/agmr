@@ -15,6 +15,71 @@ function toMin(t)        { const [h, m] = t.split(':').map(Number); return h * 6
 function slotTop(s)      { return (toMin(s) - START_H * 60) * (HOUR_PX / 60) }
 function slotHeight(s,e) { return (toMin(e) - toMin(s)) * (HOUR_PX / 60) }
 
+// ── Recurrence helpers ─────────────────────────────────────────
+const DAY_IDX = { lundi:0, mardi:1, mercredi:2, jeudi:3, vendredi:4, samedi:5 }
+
+function getMonday(date) {
+  const d = new Date(date); const day = d.getDay()
+  d.setDate(d.getDate() - (day === 0 ? 6 : day - 1)); d.setHours(0,0,0,0); return d
+}
+function getDayInWeek(monday, jourFR) {
+  const d = new Date(monday); d.setDate(d.getDate() + (DAY_IDX[jourFR] ?? 0)); return d
+}
+function nthWeekdayOfMonth(date) { return Math.ceil(date.getDate() / 7) }
+function isLastWeekdayOfMonth(date) {
+  const next = new Date(date); next.setDate(next.getDate() + 7)
+  return next.getMonth() !== date.getMonth()
+}
+
+function isActiveForWeek(course, monday) {
+  const rec = course.recurrence ?? { type: 'weekly' }
+  switch (rec.type) {
+    case 'biweekly': {
+      if (!rec.refDate) return true
+      const ref  = getMonday(new Date(rec.refDate))
+      const diff = Math.round((monday - ref) / (7 * 864e5))
+      return diff % 2 === 0
+    }
+    case 'monthly_nth': {
+      const d = getDayInWeek(monday, course.jour)
+      return nthWeekdayOfMonth(d) === rec.weekOfMonth
+    }
+    case 'monthly_last': {
+      return isLastWeekdayOfMonth(getDayInWeek(monday, course.jour))
+    }
+    case 'custom': {
+      if (!rec.refDate || !rec.interval) return true
+      const ref  = getMonday(new Date(rec.refDate))
+      const diff = Math.round((monday - ref) / (7 * 864e5))
+      return diff % rec.interval === 0
+    }
+    default: return true   // 'weekly'
+  }
+}
+
+function recurrenceLabel(rec, jour) {
+  if (!rec || rec.type === 'weekly') return null
+  const ORD = ['1er','2e','3e','4e']
+  switch (rec.type) {
+    case 'biweekly':     return '1 semaine sur 2'
+    case 'monthly_nth':  return `${ORD[rec.weekOfMonth - 1] ?? rec.weekOfMonth + 'e'} ${jour} du mois`
+    case 'monthly_last': return `Dernier ${jour} du mois`
+    case 'custom':       return `1 semaine sur ${rec.interval}`
+    default: return null
+  }
+}
+
+function recurrenceBadge(rec) {
+  if (!rec || rec.type === 'weekly') return null
+  switch (rec.type) {
+    case 'biweekly':     return '½'
+    case 'monthly_nth':  return `M${rec.weekOfMonth}`
+    case 'monthly_last': return 'ML'
+    case 'custom':       return `1/${rec.interval}`
+    default: return null
+  }
+}
+
 /**
  * Greedy column-packing: assigns each slot a _col index and _numCols total
  * so overlapping events are laid out side-by-side instead of stacked.
@@ -143,9 +208,10 @@ export default function PlanningGymClient({ courses }) {
   const todayStr    = useMemo(() => new Date().toDateString(), [])
   // Only disciplines that actually exist in the data
   const disciplines = useMemo(() => [...new Set(courses.map(c => c.discipline))].sort(), [courses])
-  const visible     = useMemo(() =>
-    selected.size === 0 ? courses : courses.filter(c => selected.has(c.discipline))
-  , [courses, selected])
+  const visible     = useMemo(() => {
+    const base = selected.size === 0 ? courses : courses.filter(c => selected.has(c.discipline))
+    return base.filter(c => isActiveForWeek(c, monday))
+  }, [courses, selected, monday])
 
   // Precompute layout per day (side-by-side overlap resolution)
   const laidByDay = useMemo(() => {
@@ -277,6 +343,11 @@ export default function PlanningGymClient({ courses }) {
                           {/* Discipline */}
                           <div style={{ fontSize: isHov ? '0.88rem' : (s._numCols > 1 ? '0.68rem' : '0.78rem'), fontWeight: 600, lineHeight: 1.25, whiteSpace: isHov ? 'normal' : 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                             {s.discipline}
+                            {!isHov && recurrenceBadge(s.recurrence) && (
+                              <span style={{ marginLeft: 4, fontSize: '0.58rem', fontWeight: 700, opacity: 0.7, verticalAlign: 'middle' }}>
+                                {recurrenceBadge(s.recurrence)}
+                              </span>
+                            )}
                           </div>
                           {/* Badges */}
                           {(isHov ? true : (s.complet || s.tag)) && (s.complet || s.tag) && (
@@ -298,10 +369,16 @@ export default function PlanningGymClient({ courses }) {
                               {s.salle}
                             </div>
                           )}
-                          {/* Niveau (hover uniquement) */}
+                          {/* Niveau (click uniquement) */}
                           {isHov && s.niveau && s.niveau !== 'tous' && (
                             <div className="gym-slot-meta" style={{ fontSize: '0.64rem', marginTop: 2, fontStyle: 'italic' }}>
                               Niveau : {s.niveau}
+                            </div>
+                          )}
+                          {/* Récurrence (click uniquement) */}
+                          {isHov && recurrenceLabel(s.recurrence, s.jour) && (
+                            <div className="gym-slot-meta" style={{ fontSize: '0.64rem', marginTop: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
+                              <span style={{ opacity: 0.6 }}>↻</span> {recurrenceLabel(s.recurrence, s.jour)}
                             </div>
                           )}
                         </div>

@@ -20,6 +20,7 @@ function mapCourse(c) {
     disc: c.disc,
     complet: c.complet ?? false,
     tag: c.tag ?? '',
+    recurrence: c.recurrence ?? { type: 'weekly' },
   }
 }
 
@@ -111,6 +112,7 @@ export default function AdminGymSection() {
       disc: item.disc,
       complet: item.complet ?? false,
       tag: item.tag || null,
+      recurrence: item.recurrence ?? { type: 'weekly' },
     }
     if (item.id) {
       await supabase.from('gym_courses').update(payload).eq('id', item.id)
@@ -146,7 +148,7 @@ export default function AdminGymSection() {
     .filter(i => fd === "all" || i.jour === fd)
     .filter(i => fdDisc === "all" || i.discipline === fdDisc)
 
-  const blank = { jour: "lundi", heureDebut: "09:00", heureFin: "10:00", discipline: "", animateur: "", salle: "", niveau: "tous", actif: true, disc: "pilates", complet: false, tag: '' }
+  const blank = { jour: "lundi", heureDebut: "09:00", heureFin: "10:00", discipline: "", animateur: "", salle: "", niveau: "tous", actif: true, disc: "pilates", complet: false, tag: '', recurrence: { type: 'weekly' } }
 
   if (loading) return <div style={{ padding: 40, color: "var(--ink-mute)" }}>Chargement...</div>
 
@@ -197,7 +199,7 @@ export default function AdminGymSection() {
       </div>
 
       <table className="tbl">
-        <thead><tr><th>Jour</th><th>Heure</th><th>Discipline</th><th>Animateur</th><th>Salle</th><th>Tag</th><th>Actif</th><th></th></tr></thead>
+        <thead><tr><th>Jour</th><th>Heure</th><th>Discipline</th><th>Animateur</th><th>Salle</th><th>Récurrence</th><th>Tag</th><th>Actif</th><th></th></tr></thead>
         <tbody>
           {filtered.map(c => (
             <tr key={c.id} style={{ opacity: c.actif ? 1 : 0.5 }}>
@@ -206,6 +208,9 @@ export default function AdminGymSection() {
               <td><strong>{c.discipline}</strong>{c.complet && <span style={{ marginLeft: 6, fontSize: "0.72rem", background: "#dc2626", color: "#fff", borderRadius: 4, padding: "1px 5px" }}>Complet</span>}</td>
               <td>{c.animateur}</td>
               <td>{c.salle}</td>
+              <td style={{ fontSize: "0.8rem", color: "var(--ink-mute)", whiteSpace: "nowrap" }}>
+                {recurrenceShort(c.recurrence)}
+              </td>
               <td style={{ whiteSpace: "nowrap" }}>
                 {c.tag === 'nouveau' && <span style={{ fontSize: "0.72rem", background: "#0891b2", color: "#fff", borderRadius: 4, padding: "1px 5px" }}>Nouveau</span>}
                 {c.tag === 'apa' && <span style={{ fontSize: "0.72rem", background: "#ca8a04", color: "#fff", borderRadius: 4, padding: "1px 5px" }}>APA</span>}
@@ -218,7 +223,7 @@ export default function AdminGymSection() {
             </tr>
           ))}
           {filtered.length === 0 && (
-            <tr><td colSpan={8} style={{ textAlign: "center", color: "var(--ink-mute)", padding: 32 }}>Aucun créneau pour cette sélection</td></tr>
+            <tr><td colSpan={9} style={{ textAlign: "center", color: "var(--ink-mute)", padding: 32 }}>Aucun créneau pour cette sélection</td></tr>
           )}
         </tbody>
       </table>
@@ -229,6 +234,83 @@ export default function AdminGymSection() {
         </Modal>
       )}
     </>
+  )
+}
+
+// ── Recurrence helpers ──────────────────────────────────────────
+const ORD = ['1er','2e','3e','4e']
+
+function recurrenceShort(rec) {
+  if (!rec || rec.type === 'weekly') return 'Toutes les sem.'
+  switch (rec.type) {
+    case 'biweekly':     return '1 sem. / 2'
+    case 'monthly_nth':  return `${ORD[rec.weekOfMonth-1] ?? rec.weekOfMonth+'e'} du mois`
+    case 'monthly_last': return 'Dernier du mois'
+    case 'custom':       return `1 sem. / ${rec.interval}`
+    default: return '—'
+  }
+}
+
+function RecurrenceSelect({ value, jour, onChange }) {
+  const rec = value ?? { type: 'weekly' }
+  const today = new Date().toISOString().slice(0, 10)
+
+  // Map rec object → select value string
+  const selectVal = (() => {
+    switch (rec.type) {
+      case 'biweekly':     return 'biweekly'
+      case 'monthly_nth':  return `monthly_${rec.weekOfMonth}`
+      case 'monthly_last': return 'monthly_last'
+      case 'custom':       return 'custom'
+      default:             return 'weekly'
+    }
+  })()
+
+  const handleType = (v) => {
+    if (v === 'weekly')       { onChange({ type: 'weekly' }); return }
+    if (v === 'biweekly')     { onChange({ type: 'biweekly', interval: 2, refDate: rec.refDate ?? today }); return }
+    if (v === 'monthly_last') { onChange({ type: 'monthly_last' }); return }
+    if (v.startsWith('monthly_')) {
+      const n = parseInt(v.replace('monthly_', ''))
+      onChange({ type: 'monthly_nth', weekOfMonth: n }); return
+    }
+    if (v === 'custom') { onChange({ type: 'custom', interval: rec.interval ?? 3, refDate: rec.refDate ?? today }) }
+  }
+
+  const needsRef = rec.type === 'biweekly' || rec.type === 'custom'
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <select value={selectVal} onChange={e => handleType(e.target.value)}>
+        <option value="weekly">Toutes les semaines</option>
+        <option value="biweekly">1 semaine sur 2</option>
+        <option value="monthly_1">Le 1er {jour} du mois</option>
+        <option value="monthly_2">Le 2e {jour} du mois</option>
+        <option value="monthly_3">Le 3e {jour} du mois</option>
+        <option value="monthly_4">Le 4e {jour} du mois</option>
+        <option value="monthly_last">Le dernier {jour} du mois</option>
+        <option value="custom">Personnalisé (toutes les N semaines)…</option>
+      </select>
+
+      {needsRef && (
+        <div style={{ display: 'flex', gap: 12, alignItems: 'flex-end', flexWrap: 'wrap' }}>
+          <div className="field" style={{ flex: 1, margin: 0 }}>
+            <label style={{ fontSize: '0.78rem' }}>Date de référence <span style={{ fontWeight: 400, color: 'var(--ink-mute)' }}>(une semaine où le cours a lieu)</span></label>
+            <input type="date" value={rec.refDate ?? ''} onChange={e => onChange({ ...rec, refDate: e.target.value })}/>
+          </div>
+          {rec.type === 'custom' && (
+            <div className="field" style={{ width: 130, margin: 0 }}>
+              <label style={{ fontSize: '0.78rem' }}>Toutes les</label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <input type="number" min={2} max={26} value={rec.interval ?? 3} style={{ width: 56 }}
+                  onChange={e => onChange({ ...rec, interval: Math.max(2, parseInt(e.target.value) || 2) })}/>
+                <span style={{ fontSize: '0.88rem', color: 'var(--ink-mute)' }}>sem.</span>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
   )
 }
 
@@ -274,6 +356,10 @@ function GymForm({ item, onSave, onCancel }) {
             <option value="apa">APA</option>
           </select>
         </div>
+      </div>
+      <div className="field">
+        <label>Récurrence</label>
+        <RecurrenceSelect value={f.recurrence} jour={f.jour} onChange={v => u("recurrence", v)}/>
       </div>
       <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
         <label style={{ display: "flex", gap: 10, alignItems: "center", fontSize: "0.92rem" }}>

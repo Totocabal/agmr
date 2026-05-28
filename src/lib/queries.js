@@ -20,6 +20,7 @@ export async function getGymCourses() {
     disc: c.disc,
     complet: c.complet ?? false,
     tag: c.tag ?? null,
+    recurrence: c.recurrence ?? { type: 'weekly' },
   }))
 }
 

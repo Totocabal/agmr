@@ -123,7 +123,7 @@ function DiscDropdown({ disciplines, selected, onChange }) {
 export default function PlanningGymClient({ courses }) {
   const [weekOffset, setWeekOffset] = useState(0)
   const [selected, setSelected]     = useState(new Set())
-  const [hoveredId, setHoveredId]   = useState(null)
+  const [clickedId, setClickedId]   = useState(null)
 
   const monday = useMemo(() => {
     const d = new Date()
@@ -231,18 +231,20 @@ export default function PlanningGymClient({ courses }) {
                 const laid    = laidByDay[day] ?? []
 
                 return (
-                  <div key={day} style={{
-                    position: 'relative',
-                    height: GRID_H,
-                    borderLeft: di > 0 ? '1px solid var(--line)' : 'none',
-                    background: isToday ? 'rgba(52,90,60,0.025)' : 'transparent',
-                    overflow: 'visible',   // allow hover expansion outside bounds
-                    zIndex: laid.some(s => s.id === hoveredId) ? 10 : 'auto',
-                  }}>
+                  <div key={day}
+                    onClick={() => setClickedId(null)}
+                    style={{
+                      position: 'relative',
+                      height: GRID_H,
+                      borderLeft: di > 0 ? '1px solid var(--line)' : 'none',
+                      background: isToday ? 'rgba(52,90,60,0.025)' : 'transparent',
+                      overflow: 'visible',
+                      zIndex: laid.some(s => s.id === clickedId) ? 10 : 'auto',
+                    }}>
                     {laid.map(s => {
                       const top   = slotTop(s.heureDebut)
                       const baseH = Math.max(slotHeight(s.heureDebut, s.heureFin), 18)
-                      const isHov = hoveredId === s.id
+                      const isHov = clickedId === s.id
                       const pct   = 100 / s._numCols
                       const GAP   = 2   // px between side-by-side cards
 
@@ -252,7 +254,7 @@ export default function PlanningGymClient({ courses }) {
                           style={{
                             position: 'absolute',
                             top,
-                            // Hover: expand to full column width
+                            // Clic : expand to full column width
                             left:   isHov ? GAP : `calc(${s._col * pct}% + ${GAP}px)`,
                             width:  isHov ? `calc(100% - ${GAP * 2}px)` : `calc(${pct}% - ${GAP * 2}px)`,
                             height: isHov ? 'auto' : baseH,
@@ -260,12 +262,11 @@ export default function PlanningGymClient({ courses }) {
                             zIndex:   isHov ? 30 : 2 + s._col,
                             overflow: 'hidden',
                             padding:  isHov ? '8px 10px' : (baseH < 30 ? '2px 5px' : '4px 7px'),
-                            cursor:   'default',
+                            cursor:   'pointer',
                             transition: 'left 0.12s ease, width 0.12s ease',
                             boxShadow: isHov ? '0 4px 16px rgba(0,0,0,0.18)' : 'none',
                           }}
-                          onMouseEnter={() => setHoveredId(s.id)}
-                          onMouseLeave={() => setHoveredId(null)}
+                          onClick={(e) => { e.stopPropagation(); setClickedId(isHov ? null : s.id) }}
                         >
                           {/* Heure */}
                           {(isHov || baseH >= 22) && (

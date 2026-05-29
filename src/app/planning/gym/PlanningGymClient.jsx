@@ -288,21 +288,21 @@ export default function PlanningGymClient({ courses, vacances = [] }) {
         </button>
       </div>
 
-        {/* ── Bannière vacances si la semaine est concernée ── */}
-        {(() => {
-          const vacNames = [...new Set(
-            DAYS.map((_, di) => {
-              const d = new Date(monday); d.setDate(d.getDate() + di)
-              return getVacationForDay(d, vacances)?.nom
-            }).filter(Boolean)
-          )]
-          return vacNames.length > 0 ? (
-            <div style={{ margin: '12px 0 0', padding: '10px 16px', background: '#fef9ec', border: '1px solid #f0d060', borderRadius: 'var(--r-sm)', display: 'flex', alignItems: 'center', gap: 10, fontSize: '0.88rem', color: '#7a6010' }}>
-              <span style={{ fontSize: '1rem' }}>🏖️</span>
-              <span><strong>Vacances scolaires</strong> — {vacNames.join(' · ')} · Pas de cours cette semaine.</span>
-            </div>
-          ) : null
-        })()}
+      {/* ── Bannière vacances si la semaine est concernée ── */}
+      {(() => {
+        const vacNames = [...new Set(
+          DAYS.map((_, di) => {
+            const d = new Date(monday); d.setDate(d.getDate() + di)
+            return getVacationForDay(d, vacances)?.nom
+          }).filter(Boolean)
+        )]
+        return vacNames.length > 0 ? (
+          <div style={{ margin: '12px 0 0', padding: '10px 16px', background: '#fef9ec', border: '1px solid #f0d060', borderRadius: 'var(--r-sm)', display: 'flex', alignItems: 'center', gap: 10, fontSize: '0.88rem', color: '#7a6010' }}>
+            <span style={{ fontSize: '1rem' }}>🏖️</span>
+            <span><strong>Vacances scolaires</strong> — {vacNames.join(' · ')} · Pas de cours cette semaine.</span>
+          </div>
+        ) : null
+      })()}
 
         {/* ── Calendar grid ── */}
         <div className="planning-time-grid" style={{ border: '1px solid var(--line)', borderRadius: 'var(--r-md)', overflow: 'hidden', background: 'var(--bg-card)', marginTop: 20 }}>

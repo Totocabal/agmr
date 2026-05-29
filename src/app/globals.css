@@ -1571,6 +1571,10 @@ img { max-width: 100%; display: block; }
 .spacer-md { height: 48px; }
 .spacer-lg { height: 72px; }
 
+/* reCAPTCHA — masqué par défaut, visible seulement sur la page contact */
+.grecaptcha-badge { visibility: hidden !important; opacity: 0 !important; }
+body.show-recaptcha .grecaptcha-badge { visibility: visible !important; opacity: 1 !important; }
+
 /* Focus */
 *:focus-visible {
   outline: 3px solid var(--accent);

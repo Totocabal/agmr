@@ -18,7 +18,7 @@ export default function ActualitesClient({ articles }) {
             </button>
           ))}
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 20 }}>
+        <div className="news-grid">
           {filtered.map(n => (
             <article key={n.id} style={{ background: "var(--bg-card)", border: "1px solid var(--line-soft)", borderRadius: "var(--r-md)", padding: 28 }}>
               <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 14, fontSize: "0.82rem", color: "var(--ink-mute)" }}>

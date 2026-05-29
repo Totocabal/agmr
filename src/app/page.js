@@ -159,7 +159,7 @@ export default async function HomePage() {
                   <h2 className="section-title">Dernières actualités</h2>
                 </div>
                 <Link className="btn btn-ghost" href="/actualites">
-                  Toutes les actualites →
+                  Toutes les actualités →
                 </Link>
               </div>
               <div className="news-split">

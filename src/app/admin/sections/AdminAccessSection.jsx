@@ -54,19 +54,42 @@ export default function AdminAccessSection() {
   }
   useEffect(() => { load() }, [])
 
+  const [resetTarget, setResetTarget] = useState(null) // { email, id }
+  const [inviting, setInviting]       = useState(false)
+
   const saveAdmin = async (data) => {
-    const payload = {
-      email:        data.email.trim().toLowerCase(),
-      display_name: data.display_name.trim() || null,
-      role:         data.role,
-      permissions:  data.role === 'super_admin' ? [] : data.permissions,
-    }
     if (data.id) {
-      await supabase.from('admin_profiles').update(payload).eq('id', data.id)
+      // Modification simple du profil existant (pas de réinvitation)
+      await supabase.from('admin_profiles').update({
+        display_name: data.display_name.trim() || null,
+        role:         data.role,
+        permissions:  data.role === 'super_admin' ? [] : data.permissions,
+      }).eq('id', data.id)
+      setEditing(null); load()
     } else {
-      await supabase.from('admin_profiles').insert(payload)
+      // Nouvel admin : invitation via API route (Auth + profil en une fois)
+      setInviting(true)
+      const res = await fetch('/api/admin/invite', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      })
+      const json = await res.json()
+      setInviting(false)
+      if (!res.ok) { alert('Erreur : ' + (json.error ?? 'Inconnue')); return }
+      setAdding(false); load()
     }
-    setEditing(null); setAdding(false); load()
+  }
+
+  const resetPassword = async (targetEmail, newPassword) => {
+    const res = await fetch('/api/admin/reset-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ targetEmail, newPassword }),
+    })
+    const json = await res.json()
+    if (!res.ok) { alert('Erreur : ' + (json.error ?? 'Inconnue')); return false }
+    return true
   }
 
   const deleteAdmin = async (id, email) => {

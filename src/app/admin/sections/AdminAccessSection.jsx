@@ -363,9 +363,9 @@ function AdminForm({ item, onSave, onCancel }) {
         <button
           className="btn btn-primary"
           onClick={() => onSave(f)}
-          disabled={!f.email.trim()}
+          disabled={!f.email.trim() || (isNew && f.password.length < 8)}
         >
-          {item.id ? 'Enregistrer' : '✉ Envoyer l\'invitation'}
+          {item.id ? 'Enregistrer' : 'Créer le compte'}
         </button>
       </div>
     </div>

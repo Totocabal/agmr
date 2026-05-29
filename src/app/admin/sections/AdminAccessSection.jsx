@@ -163,9 +163,10 @@ export default function AdminAccessSection() {
 
       {/* Info box */}
       <div style={{ marginTop: 24, padding: "14px 18px", background: "var(--bg-deep)", borderRadius: "var(--r-sm)", fontSize: "0.84rem", color: "var(--ink-mute)", border: "1px solid var(--line)" }}>
-        <strong style={{ color: "var(--ink-soft)" }}>Comment ça fonctionne :</strong> L'email doit correspondre exactement au compte Supabase Auth.
+        <strong style={{ color: "var(--ink-soft)" }}>Invitation :</strong> cliquer sur « Ajouter un admin » envoie automatiquement un e-mail d'invitation
+        à la personne pour qu'elle définisse son mot de passe. Elle peut ensuite se connecter sur{' '}
+        <code>/admin</code>.{' '}
         Un <em>super admin</em> a accès à tout. Un <em>admin classique</em> n'accède qu'aux sections cochées.
-        Ajoutez d'abord l'utilisateur ici, puis demandez-lui de se connecter sur <code>/admin</code>.
       </div>
 
       {/* Modal édition */}

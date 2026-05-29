@@ -20,7 +20,7 @@ export default function AdminGuideSection() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
         <GuideBlock
-          icon="🏠"
+          icon={<Icon name="home" size={18}/>}
           title="Page principale"
           section="Activités → Page principale"
           items={[

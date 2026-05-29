@@ -40,7 +40,12 @@ export default function ContactClient() {
     }
   }
 
-  useEffect(() => { loadRecaptcha() }, [])
+  useEffect(() => {
+    loadRecaptcha()
+    // Affiche le badge reCAPTCHA uniquement sur cette page
+    document.body.classList.add('show-recaptcha')
+    return () => document.body.classList.remove('show-recaptcha')
+  }, [])
 
   const submit = async (e) => {
     e.preventDefault()

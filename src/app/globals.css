@@ -33,6 +33,7 @@
   --base-size: 18px;
   --serif: "Cormorant Garamond", "Playfair Display", Georgia, serif;
   --sans: "Source Sans 3", "Source Sans Pro", -apple-system, system-ui, sans-serif;
+  --display: var(--font-display, "Inter", system-ui, sans-serif);
 
   /* Spacing */
   --gap-xs: 6px;

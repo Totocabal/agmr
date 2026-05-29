@@ -169,6 +169,23 @@ export default function AdminAccessSection() {
         Un <em>super admin</em> a accès à tout. Un <em>admin classique</em> n'accède qu'aux sections cochées.
       </div>
 
+      {/* Modal reset mot de passe */}
+      {resetTarget && (
+        <Modal
+          title={`Mot de passe — ${resetTarget.name}`}
+          onClose={() => setResetTarget(null)}
+        >
+          <ResetPasswordForm
+            target={resetTarget}
+            onSave={async (pwd) => {
+              const ok = await resetPassword(resetTarget.email, pwd)
+              if (ok) { alert('Mot de passe modifié avec succès.'); setResetTarget(null) }
+            }}
+            onCancel={() => setResetTarget(null)}
+          />
+        </Modal>
+      )}
+
       {/* Modal édition */}
       {(editing || adding) && (
         <Modal

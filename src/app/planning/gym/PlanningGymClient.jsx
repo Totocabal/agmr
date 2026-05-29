@@ -195,11 +195,49 @@ function DiscDropdown({ disciplines, selected, onChange }) {
   )
 }
 
+// ── Fullscreen landscape helper ────────────────────────────────
+function usePlanningFullscreen() {
+  const [isOpen, setIsOpen] = useState(false)
+
+  const open = useCallback(async () => {
+    setIsOpen(true)
+    try {
+      if (document.documentElement.requestFullscreen) {
+        await document.documentElement.requestFullscreen()
+      }
+      if (screen.orientation?.lock) {
+        await screen.orientation.lock('landscape').catch(() => {})
+      }
+    } catch {}
+    document.body.style.overflow = 'hidden'
+  }, [])
+
+  const close = useCallback(async () => {
+    setIsOpen(false)
+    document.body.style.overflow = ''
+    try {
+      if (document.fullscreenElement) await document.exitFullscreen()
+      if (screen.orientation?.unlock) screen.orientation.unlock()
+    } catch {}
+  }, [])
+
+  // Close on Escape
+  useEffect(() => {
+    if (!isOpen) return
+    const onKey = (e) => { if (e.key === 'Escape') close() }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [isOpen, close])
+
+  return { isOpen, open, close }
+}
+
 // ── Main ───────────────────────────────────────────────────────
 export default function PlanningGymClient({ courses, vacances = [] }) {
   const [weekOffset, setWeekOffset] = useState(0)
   const [selected, setSelected]     = useState(new Set())
   const [clickedId, setClickedId]   = useState(null)
+  const fullscreen = usePlanningFullscreen()
 
   const monday = useMemo(() => {
     const d = new Date()

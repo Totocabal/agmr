@@ -54,7 +54,7 @@ export default async function HomePage() {
                   {hero.cta1_texte ?? "Je m'inscris"}
                 </Link>
                 <Link className="btn btn-light btn-lg" href={hero.cta2_lien ?? '/activites/gym'}>
-                  {hero.cta2_texte ?? 'Decouvrir nos activites'}
+                  {hero.cta2_texte ?? 'Découvrir nos activités'}
                 </Link>
               </div>
             </div>

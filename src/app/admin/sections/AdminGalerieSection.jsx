@@ -368,7 +368,11 @@ export default function AdminGalerieSection() {
       {/* ── Grille d'albums ── */}
       {albumNames.length === 0 ? (
         <div style={{ padding: 48, textAlign: 'center', color: 'var(--ink-mute)', background: 'var(--bg-elev)', borderRadius: 'var(--r-md)', border: '2px dashed var(--line)' }}>
-          <div style={{ fontSize: '2rem', marginBottom: 12 }}>🖼️</div>
+          <svg width="56" height="56" viewBox="0 0 56 56" fill="none" style={{ marginBottom: 16, opacity: 0.45 }}>
+            <rect x="4" y="8" width="48" height="40" rx="4" stroke="var(--ink-soft)" strokeWidth="1.8" fill="none"/>
+            <circle cx="18" cy="22" r="4" fill="var(--ink-mute)"/>
+            <path d="M4 36 L16 24 L26 34 L36 22 L52 36" stroke="var(--ink-soft)" strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
           <p style={{ margin: 0 }}>Aucun album. Uploadez des photos ci-dessus pour créer le premier.</p>
         </div>
       ) : (

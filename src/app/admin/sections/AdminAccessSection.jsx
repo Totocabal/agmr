@@ -161,7 +161,7 @@ export default function AdminAccessSection() {
                 </button>
               )}
               <button className="icon-btn" onClick={() => setEditing(a)}><Icon name="edit" size={14}/></button>
-              <button className="icon-btn" onClick={() => deleteAdmin(a.id, a.email)} style={{ color: "var(--accent)" }}><Icon name="trash" size={14}/></button>
+              <button className="icon-btn" onClick={() => deleteAdmin(a.id, a.email, a.role)} style={{ color: "var(--accent)" }}><Icon name="trash" size={14}/></button>
             </div>
           </div>
         ))}

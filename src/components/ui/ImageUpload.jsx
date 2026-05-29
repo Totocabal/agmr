@@ -139,9 +139,11 @@ function CropModal({ src, onConfirm, onCancel, defaultAspect = 16 / 9 }) {
           image={src}
           crop={crop}
           zoom={zoom}
+          rotation={rotation}
           aspect={ratio}
           onCropChange={setCrop}
           onZoomChange={setZoom}
+          onRotationChange={setRotation}
           onCropComplete={onCropComplete}
           style={{
             containerStyle: { background: '#0d1510' },

@@ -188,17 +188,28 @@ export default function AdminGymSection() {
             ))}
           </div>
         </div>
-        <div className="admin-filter-row">
+        <div className="admin-filter-row" style={{ alignItems: 'center' }}>
           <div className="admin-filter-label">Discipline</div>
-          <div className="admin-filter-options" role="group" aria-label="Filtrer par discipline">
-            <button className={`admin-filter-chip ${fdDisc === "all" ? "active" : ""}`} onClick={() => setFdDisc("all")} aria-pressed={fdDisc === "all"}>
-              Toutes <span>{items.length}</span>
-            </button>
-            {disciplines.map(d => (
-              <button key={d} className={`admin-filter-chip ${fdDisc === d ? "active" : ""}`} onClick={() => setFdDisc(d)} aria-pressed={fdDisc === d}>
-                {d} <span>{disciplineCounts[d] ?? 0}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <select
+              value={fdDisc}
+              onChange={e => setFdDisc(e.target.value)}
+              style={{ padding: '7px 12px', border: '1px solid var(--line-strong)', borderRadius: 'var(--r-sm)', fontFamily: 'inherit', fontSize: '0.9rem', background: 'var(--bg-card)', color: 'var(--ink)', cursor: 'pointer', minWidth: 260 }}
+            >
+              <option value="all">Toutes les disciplines ({items.length})</option>
+              {disciplines.map(d => (
+                <option key={d} value={d}>{d} ({disciplineCounts[d] ?? 0})</option>
+              ))}
+            </select>
+            {fdDisc !== "all" && (
+              <button
+                className="btn btn-ghost btn-sm"
+                onClick={() => setFdDisc("all")}
+                style={{ color: 'var(--ink-mute)' }}
+              >
+                ✕ Effacer
               </button>
-            ))}
+            )}
           </div>
         </div>
       </div>

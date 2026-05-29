@@ -138,8 +138,8 @@ export default function AdminGuideSection() {
         {/* Conseils généraux */}
         <div style={{ background: 'var(--bg-card)', border: '1px solid var(--line)', borderRadius: 'var(--r-md)', overflow: 'hidden' }}>
           <div style={{ background: 'var(--green)', padding: '14px 20px' }}>
-            <h3 style={{ color: '#fff', fontFamily: 'var(--sans)', fontSize: '1rem', fontWeight: 700, margin: 0 }}>
-              💡 Conseils généraux
+            <h3 style={{ color: '#fff', fontFamily: 'var(--sans)', fontSize: '1rem', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
+              <Icon name="sun" size={16}/> Conseils généraux
             </h3>
           </div>
           <div style={{ padding: '18px 22px', display: 'flex', flexDirection: 'column', gap: 12 }}>

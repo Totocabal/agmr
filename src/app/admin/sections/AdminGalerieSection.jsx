@@ -191,23 +191,41 @@ function AlbumView({ album, photos, onBack, onDeleted, onRenamed, supabase }) {
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
-          {photos.map(photo => (
-            <div key={photo.id} style={{ position: 'relative', aspectRatio: '1/1', borderRadius: 'var(--r-sm)', overflow: 'hidden', background: 'var(--bg-deep)' }}>
-              <img src={photo.url} alt={photo.legende} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>
+          {photos.map(photo => {
+            const isSel = selected.has(photo.id)
+            return (
               <div
-                style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0)', transition: 'background .2s', display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-end', padding: 8 }}
-                onMouseEnter={e => e.currentTarget.style.background = 'rgba(0,0,0,0.4)'}
-                onMouseLeave={e => e.currentTarget.style.background = 'rgba(0,0,0,0)'}
+                key={photo.id}
+                onClick={() => selecting ? toggleSelect(photo.id) : null}
+                style={{ position: 'relative', aspectRatio: '1/1', borderRadius: 'var(--r-sm)', overflow: 'hidden', background: 'var(--bg-deep)', cursor: selecting ? 'pointer' : 'default', outline: isSel ? '3px solid var(--accent)' : 'none', outlineOffset: -3 }}
               >
-                <button
-                  onClick={() => deletePhoto(photo)}
-                  style={{ background: 'rgba(255,255,255,0.9)', border: 'none', borderRadius: '50%', width: 28, height: 28, display: 'grid', placeItems: 'center', cursor: 'pointer', color: 'var(--accent)' }}
-                >
-                  <Icon name="trash" size={12}/>
-                </button>
+                <img src={photo.url} alt={photo.legende} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: selecting && !isSel ? 0.6 : 1, transition: 'opacity .15s' }}/>
+
+                {/* Overlay sélection */}
+                {selecting && (
+                  <div style={{ position: 'absolute', top: 8, left: 8, width: 22, height: 22, borderRadius: 4, background: isSel ? 'var(--accent)' : 'rgba(255,255,255,0.85)', border: isSel ? '2px solid var(--accent)' : '2px solid rgba(0,0,0,0.25)', display: 'grid', placeItems: 'center', transition: 'all .1s' }}>
+                    {isSel && <span style={{ color: '#fff', fontSize: '0.75rem', fontWeight: 700, lineHeight: 1 }}>✓</span>}
+                  </div>
+                )}
+
+                {/* Overlay suppression (mode normal) */}
+                {!selecting && (
+                  <div
+                    style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0)', transition: 'background .2s', display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-end', padding: 8 }}
+                    onMouseEnter={e => e.currentTarget.style.background = 'rgba(0,0,0,0.4)'}
+                    onMouseLeave={e => e.currentTarget.style.background = 'rgba(0,0,0,0)'}
+                  >
+                    <button
+                      onClick={() => deletePhoto(photo)}
+                      style={{ background: 'rgba(255,255,255,0.9)', border: 'none', borderRadius: '50%', width: 28, height: 28, display: 'grid', placeItems: 'center', cursor: 'pointer', color: 'var(--accent)' }}
+                    >
+                      <Icon name="trash" size={12}/>
+                    </button>
+                  </div>
+                )}
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
     </div>

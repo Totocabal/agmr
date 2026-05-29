@@ -58,6 +58,7 @@ export async function getActualites() {
     date: n.date,
     title: n.title,
     excerpt: n.excerpt,
+    image_url: n.image_url ?? null,
   }))
 }
 

@@ -180,8 +180,8 @@ export default function AdminGymSection() {
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState(null)
-  const [fd, setFd] = useState("all")
-  const [fdDisc, setFdDisc] = useState("all")
+  const [fd, setFd]         = useState("all")
+  const [fdDiscs, setFdDiscs] = useState(new Set()) // Set vide = toutes
   const supabase = useMemo(() => createClient(), [])
 
   const fetchCourses = useCallback(async () => {

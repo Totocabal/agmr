@@ -76,7 +76,7 @@ export default function AdminGuideSection() {
         />
 
         <GuideBlock
-          icon="🏖️"
+          icon={<Icon name="pin" size={18}/>}
           title="Séjours"
           section="Contenus → Séjours"
           items={[

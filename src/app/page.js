@@ -77,7 +77,7 @@ export default async function HomePage() {
                 <div className="section-eyebrow">Trois activites, un meme esprit</div>
                 <h2 className="section-title">Choisissez votre tempo.</h2>
                 <p className="section-lede">
-                  Une adhesion unique donne acces a la gym et/ou a la marche.
+                  Une adhésion unique donne accès à la gym et/ou à la marche.
                   A vous de construire votre semaine.
                 </p>
               </div>

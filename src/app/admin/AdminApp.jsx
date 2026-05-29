@@ -22,6 +22,7 @@ import AdminAGSection from './sections/AdminAGSection'
 import AdminAccessSection from './sections/AdminAccessSection'
 import AdminVacancesSection from './sections/AdminVacancesSection'
 import AdminSejoursSection from './sections/AdminSejoursSection'
+import AdminTarifsSection from './sections/AdminTarifsSection'
 
 // ── Sidebar ───────────────────────────────────────────────────
 function AdminSidebar({ section, setSection, user, canAccess, isSuperAdmin }) {

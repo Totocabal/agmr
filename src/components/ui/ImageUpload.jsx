@@ -157,7 +157,7 @@ function CropModal({ src, onConfirm, onCancel, defaultAspect = 16 / 9 }) {
 }
 
 // ── Composant principal ───────────────────────────────────────
-export default function ImageUpload({ value, onChange, folder = 'medias', height = 140, label = 'Image' }) {
+export default function ImageUpload({ value, onChange, folder = 'medias', height = 140, label = 'Image', defaultAspect = 16 / 9 }) {
   const [rawSrc, setRawSrc]   = useState(null)   // URL objet avant crop
   const [uploading, setUploading] = useState(false)
   const [error, setError]     = useState(null)

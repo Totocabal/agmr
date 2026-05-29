@@ -304,8 +304,8 @@ export default function PlanningGymClient({ courses, vacances = [] }) {
         ) : null
       })()}
 
-        {/* ── Calendar grid ── */}
-        <div className="planning-time-grid" style={{ border: '1px solid var(--line)', borderRadius: 'var(--r-md)', overflow: 'hidden', background: 'var(--bg-card)', marginTop: 20 }}>
+      {/* ── Calendar grid ── */}
+      <div className="planning-time-grid" style={{ border: '1px solid var(--line)', borderRadius: 'var(--r-md)', overflow: 'hidden', background: 'var(--bg-card)', marginTop: 20 }}>
 
           {/* Day headers */}
           <div style={{ display: 'grid', gridTemplateColumns: `${TIME_W}px repeat(6, 1fr)`, borderBottom: '2px solid var(--line)', background: 'var(--bg-deep)' }}>

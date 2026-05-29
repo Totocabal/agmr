@@ -1,4 +1,4 @@
-import { Cormorant_Garamond, Source_Sans_3 } from 'next/font/google'
+import { Cormorant_Garamond, Source_Sans_3, Inter } from 'next/font/google'
 import './globals.css'
 
 const cormorant = Cormorant_Garamond({
@@ -12,6 +12,12 @@ const sourceSans = Source_Sans_3({
   subsets: ['latin'],
   weight: ['300', '400', '500', '600', '700'],
   variable: '--font-sans',
+})
+
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['800'],
+  variable: '--font-display',
 })
 
 export const metadata = {

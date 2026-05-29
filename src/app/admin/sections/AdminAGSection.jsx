@@ -105,14 +105,21 @@ export default function AdminAGSection() {
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {bySaison[saison].map(doc => (
               <div key={doc.id} style={{ background: "var(--bg-card)", border: "1px solid var(--line)", borderRadius: "var(--r-md)", padding: "12px 18px", display: "flex", alignItems: "center", gap: 14 }}>
-                <Icon name="file" size={16} style={{ color: "var(--ink-mute)", flexShrink: 0 }}/>
+                {/* Icône PDF */}
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={doc.url && doc.url !== '#' ? "var(--accent)" : "var(--ink-mute)"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <line x1="9" y1="13" x2="15" y2="13"/>
+                  <line x1="9" y1="17" x2="15" y2="17"/>
+                </svg>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontWeight: 600, fontSize: "0.95rem" }}>{doc.titre}</div>
-                  {doc.url && doc.url !== '#' && (
-                    <div style={{ fontSize: "0.8rem", color: "var(--ink-mute)", marginTop: 2 }}>{doc.url}</div>
-                  )}
+                  {doc.url && doc.url !== '#'
+                    ? <a href={doc.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: "0.78rem", color: "var(--accent)", textDecoration: "none" }}>Ouvrir le PDF ↗</a>
+                    : <span style={{ fontSize: "0.78rem", color: "var(--ink-mute)" }}>Aucun fichier</span>
+                  }
                 </div>
-                <div style={{ display: "flex", gap: 6 }}>
+                <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
                   <button className="icon-btn" onClick={() => setEditing(doc)}><Icon name="edit" size={14}/></button>
                   <button className="icon-btn" onClick={() => deleteDoc(doc.id)}><Icon name="trash" size={14}/></button>
                 </div>

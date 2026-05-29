@@ -880,7 +880,8 @@ img { max-width: 100%; display: block; }
   flex-direction: column;
   justify-content: center;
 }
-.news-side:not(:last-child)       { border-bottom: none; border-radius: 0; }
+.news-side + .news-side           { border-top: none; }
+.news-side:not(:first-child):not(:last-child) { border-radius: 0; }
 .news-side:first-child            { border-radius: var(--r-md) var(--r-md) 0 0; }
 .news-side:last-child             { border-radius: 0 0 var(--r-md) var(--r-md); }
 .news-side:first-child:last-child { border-radius: var(--r-md); }

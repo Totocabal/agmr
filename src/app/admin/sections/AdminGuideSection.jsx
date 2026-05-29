@@ -45,7 +45,7 @@ export default function AdminGuideSection() {
         />
 
         <GuideBlock
-          icon="📅"
+          icon={<Icon name="sun" size={18}/>}
           title="Vacances scolaires"
           section="Activités → Vacances scolaires"
           items={[

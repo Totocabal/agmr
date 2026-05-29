@@ -185,14 +185,15 @@ export default async function HomePage() {
                 <div className="news-side-list">
                   {actualites.slice(1, 4).map(n => (
                     <article className="news-side" key={n.id}>
-                      <div className="news-meta">
-                        <span className={`news-cat news-cat-${n.cat}`}>
-                          {catLabel(n.cat)}
-                        </span>
-                        <span>{formatDateFR(n.date)}</span>
+                      <div>
+                        <div className="news-meta" style={{ marginBottom: 10 }}>
+                          <span className={`news-cat news-cat-${n.cat}`}>{catLabel(n.cat)}</span>
+                          <span>{formatDateFR(n.date)}</span>
+                        </div>
+                        <h4>{n.title}</h4>
+                        <p>{n.excerpt.slice(0, 90)}{n.excerpt.length > 90 ? '…' : ''}</p>
                       </div>
-                      <h4>{n.title}</h4>
-                      <p>{n.excerpt.slice(0, 90)}...</p>
+                      <a href="/actualites" className="news-side-link">Lire la suite →</a>
                     </article>
                   ))}
                 </div>

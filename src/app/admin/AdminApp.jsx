@@ -638,6 +638,7 @@ export default function AdminApp({ user, profile }) {
           {section === "comite"        && canAccess("comite")        && <AdminComiteSection/>}
           {section === "ag"            && canAccess("ag")            && <AdminAGSection/>}
           {section === "tarifs"        && canAccess("tarifs")        && <AdminTarifsSection/>}
+          {section === "guide"         && <AdminGuideSection/>}
           {section === "settings"      && <AdminSettings user={user}/>}
           {section === "access"        && isSuperAdmin               && <AdminAccessSection/>}
         </div>

@@ -32,7 +32,7 @@ export default function AdminGuideSection() {
         />
 
         <GuideBlock
-          icon="🏋️"
+          icon={<Icon name="calendar" size={18}/>}
           title="Planning Gym"
           section="Activités → Planning Gym"
           items={[

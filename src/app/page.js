@@ -209,7 +209,7 @@ export default async function HomePage() {
             <div className="container">
               <div className="cta-banner">
                 <div style={{ position: "relative" }}>
-                  <h3>{cta.titre ?? "Premiere seance d'essai gratuite."}</h3>
+                  <h3>{cta.titre ?? "Première séance d'essai gratuite."}</h3>
                   <p>{cta.sous_titre ?? "Sur simple inscription par telephone ou en ligne. Aucun engagement."}</p>
                 </div>
                 <div style={{ display: "flex", gap: 12, position: "relative" }}>

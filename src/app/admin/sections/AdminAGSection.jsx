@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import Icon from '@/components/ui/Icon'
 import { createClient } from '@/lib/supabase-client'
+import PdfUpload from '@/components/ui/PdfUpload'
 
 function Modal({ title, onClose, children }) {
   return (

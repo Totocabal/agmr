@@ -4,19 +4,58 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import AGMRLogo from '@/components/ui/AGMRLogo'
 import Icon from '@/components/ui/Icon'
+import { createClient } from '@/lib/supabase-client'
+
+function toMin(t) { const [h, m] = t.split(':').map(Number); return h * 60 + m }
 
 export default function Header() {
   const pathname = usePathname()
   const [menuOpen, setMenuOpen] = useState(false)
   const [expanded, setExpanded] = useState(null)
+  const [navMeta, setNavMeta] = useState({
+    gym:     '…',
+    rando:   '…',
+  })
+
+  useEffect(() => {
+    const sb = createClient()
+    Promise.all([
+      sb.from('gym_courses').select('discipline, heure_debut, heure_fin').eq('actif', true),
+      sb.from('rando_sorties').select('groupes, type')
+        .gte('date', new Date().toISOString().slice(0, 10))
+        .eq('annule', false),
+    ]).then(([gym, rando]) => {
+      // Gym : disciplines uniques + total heures par semaine
+      const courses     = gym.data ?? []
+      const disciplines = new Set(courses.map(c => c.discipline)).size
+      const totalMin    = courses.reduce((sum, c) => {
+        const d = toMin(c.heure_fin) - toMin(c.heure_debut)
+        return sum + (d > 0 ? d : 0)
+      }, 0)
+      const heures = Math.round(totalMin / 60)
+
+      // Rando : nombre de sorties à venir
+      const sorties = rando.data ?? []
+      const nbSorties = sorties.length
+
+      setNavMeta({
+        gym:   `${disciplines} discipline${disciplines > 1 ? 's' : ''} · ${heures}h/semaine`,
+        rando: nbSorties > 0
+          ? `${nbSorties} sortie${nbSorties > 1 ? 's' : ''} à venir`
+          : 'Jeudi et dimanche',
+      })
+    }).catch(() => {
+      setNavMeta({ gym: '10 disciplines · 43h/semaine', rando: 'Jeudi et dimanche' })
+    })
+  }, [])
 
   const items = [
     { id: "home", label: "Accueil", href: "/" },
     { id: "activites", label: "Activités", group: ["/activites"], drop: [
-      { href: "/activites/gym", label: "Gymnastique", meta: "10 disciplines · 43h/semaine" },
-      { href: "/activites/randonnee", label: "Randonnée", meta: "5 groupes · jeudi et dimanche" },
-      { href: "/activites/nordique", label: "Marche nordique", meta: "Mardi et samedi · bâtons fournis" },
-      { href: "/activites/sante", label: "Santé par le sport", meta: "Prescri'Forme · Rando-Santé" },
+      { href: "/activites/gym",       label: "Gymnastique",        meta: navMeta.gym   },
+      { href: "/activites/randonnee", label: "Randonnée",          meta: navMeta.rando },
+      { href: "/activites/nordique",  label: "Marche nordique",    meta: "Mardi et samedi · bâtons fournis" },
+      { href: "/activites/sante",     label: "Santé par le sport", meta: "Prescri'Forme · Rando-Santé" },
     ]},
     { id: "planning", label: "Planning", group: ["/planning"], drop: [
       { href: "/planning/gym", label: "Planning Gym", meta: "Grille hebdomadaire" },

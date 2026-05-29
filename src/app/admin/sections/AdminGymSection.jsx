@@ -1,8 +1,117 @@
 'use client'
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import Icon from '@/components/ui/Icon'
 import { createClient } from '@/lib/supabase-client'
 import { logActivity } from '@/lib/activity'
+
+// ── Filtre discipline multi-sélection ─────────────────────────
+function DisciplineFilter({ disciplines, counts, selected, onChange }) {
+  const [open, setOpen]     = useState(false)
+  const [search, setSearch] = useState('')
+  const ref = useRef()
+
+  // Fermer au clic extérieur
+  useEffect(() => {
+    const h = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false) }
+    document.addEventListener('mousedown', h)
+    return () => document.removeEventListener('mousedown', h)
+  }, [])
+
+  const filtered = disciplines.filter(d =>
+    !search || d.toLowerCase().includes(search.toLowerCase())
+  )
+
+  const toggle = (d) => {
+    const next = new Set(selected)
+    next.has(d) ? next.delete(d) : next.add(d)
+    onChange(next)
+  }
+  const allSelected = selected.size === 0
+  const total       = disciplines.reduce((s, d) => s + (counts[d] ?? 0), 0)
+
+  // Label du bouton déclencheur
+  const triggerLabel = allSelected
+    ? `Toutes`
+    : selected.size === 1
+      ? [...selected][0]
+      : `${selected.size} disciplines`
+
+  return (
+    <div ref={ref} style={{ position: 'relative' }}>
+      {/* Bouton déclencheur — style admin-filter-chip */}
+      <button
+        className={`admin-filter-chip ${!allSelected ? 'active' : ''}`}
+        onClick={() => setOpen(o => !o)}
+        style={{ gap: 8 }}
+      >
+        <span>{triggerLabel}</span>
+        <span>{allSelected ? total : [...selected].reduce((s, d) => s + (counts[d] ?? 0), 0)}</span>
+        <Icon name={open ? 'chevronUp' : 'chevronDown'} size={11}/>
+      </button>
+
+      {/* Panel déroulant */}
+      {open && (
+        <div style={{
+          position: 'absolute', top: 'calc(100% + 6px)', left: 0, zIndex: 200,
+          background: 'var(--bg-card)', border: '1px solid var(--line)',
+          borderRadius: 'var(--r-md)', boxShadow: 'var(--sh-md)',
+          width: 300, maxHeight: 360, display: 'flex', flexDirection: 'column',
+          overflow: 'hidden',
+        }}>
+          {/* Recherche */}
+          <div style={{ padding: '10px 12px', borderBottom: '1px solid var(--line-soft)' }}>
+            <input
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Rechercher…"
+              autoFocus
+              style={{ width: '100%', padding: '6px 10px', border: '1px solid var(--line-strong)', borderRadius: 'var(--r-sm)', fontFamily: 'inherit', fontSize: '0.88rem', background: 'var(--bg-elev)', color: 'var(--ink)' }}
+            />
+          </div>
+
+          {/* Option "Toutes" */}
+          <button
+            onClick={() => { onChange(new Set()); setSearch('') }}
+            style={{ padding: '9px 14px', background: 'none', border: 'none', borderBottom: '1px solid var(--line-soft)', textAlign: 'left', cursor: 'pointer', fontSize: '0.9rem', fontFamily: 'inherit', color: allSelected ? 'var(--accent)' : 'var(--ink-mute)', fontWeight: allSelected ? 700 : 400, display: 'flex', justifyContent: 'space-between' }}
+          >
+            <span>Toutes les disciplines</span>
+            <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>{total}</span>
+          </button>
+
+          {/* Liste avec scroll */}
+          <div style={{ overflowY: 'auto', flex: 1 }}>
+            {filtered.map(d => {
+              const isSel = selected.has(d)
+              return (
+                <label key={d} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 14px', cursor: 'pointer', fontSize: '0.9rem', color: 'var(--ink-soft)', background: isSel ? 'var(--accent-tint)' : 'transparent', transition: 'background .1s' }}
+                  onMouseEnter={e => { if (!isSel) e.currentTarget.style.background = 'var(--bg-elev)' }}
+                  onMouseLeave={e => { if (!isSel) e.currentTarget.style.background = 'transparent' }}
+                >
+                  <input type="checkbox" checked={isSel} onChange={() => toggle(d)} style={{ accentColor: 'var(--accent)', width: 15, height: 15, flexShrink: 0 }}/>
+                  <span style={{ flex: 1 }}>{d}</span>
+                  <span style={{ fontSize: '0.78rem', color: 'var(--ink-mute)', background: 'var(--bg-deep)', borderRadius: 99, padding: '1px 7px', fontWeight: 600 }}>{counts[d] ?? 0}</span>
+                </label>
+              )
+            })}
+            {filtered.length === 0 && (
+              <div style={{ padding: '12px 14px', color: 'var(--ink-mute)', fontSize: '0.88rem' }}>Aucun résultat</div>
+            )}
+          </div>
+
+          {/* Pied : effacer */}
+          {!allSelected && (
+            <div style={{ padding: '8px 12px', borderTop: '1px solid var(--line-soft)', display: 'flex', justifyContent: 'flex-end' }}>
+              <button onClick={() => { onChange(new Set()); setSearch('') }}
+                style={{ background: 'none', border: 'none', color: 'var(--accent)', cursor: 'pointer', fontSize: '0.82rem', fontFamily: 'inherit', fontWeight: 600 }}>
+                ✕ Effacer la sélection
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
 
 const DAYS = ["lundi","mardi","mercredi","jeudi","vendredi","samedi"]
 const DISCS = ["pilates","yoga","stretch","senior","renfo","step","fitball","pound","low","tendance"]

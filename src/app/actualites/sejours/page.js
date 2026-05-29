@@ -37,9 +37,9 @@ export default async function SejoursPage() {
             <h2 style={{ fontFamily: "var(--serif)", fontSize: "2rem", marginBottom: 28 }}>Saison 2025-2026</h2>
             <div style={{ display: "flex", flexDirection: "column", gap: 20, marginBottom: 64 }}>
               {sejours.map(s => (
-                <div key={s.id} style={{ background: "var(--bg-card)", border: "1px solid var(--line-soft)", borderRadius: "var(--r-md)", overflow: "hidden", display: "grid", gridTemplateColumns: "200px 1fr auto", alignItems: "stretch" }}>
-                  <div style={{ background: IMG_STYLES[s.img] || IMG_STYLES.a, minHeight: 160 }}/>
-                  <div style={{ padding: "22px 28px" }}>
+                <div key={s.id} className="sejour-page-card">
+                  <div className="sejour-page-img" style={{ background: IMG_STYLES[s.img] || IMG_STYLES.a }}/>
+                  <div className="sejour-page-body">
                     <div style={{ fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--accent)", marginBottom: 6 }}>
                       {s.transport}
                     </div>
@@ -50,7 +50,7 @@ export default async function SejoursPage() {
                     </div>
                     <p style={{ color: "var(--ink-soft)", fontSize: "0.94rem", margin: 0 }}>{s.description}</p>
                   </div>
-                  <div style={{ padding: "22px 24px", display: "flex", flexDirection: "column", alignItems: "flex-end", justifyContent: "center", gap: 10, borderLeft: "1px solid var(--line-soft)", minWidth: 160 }}>
+                  <div className="sejour-page-status">
                     {s.statut === "ouvert" && <>
                       <span className="badge badge-ok" style={{ fontSize: "0.68rem", letterSpacing: "0.1em" }}>Inscriptions ouvertes</span>
                       <Link className="btn btn-primary btn-sm" href="/inscriptions">S'inscrire</Link>

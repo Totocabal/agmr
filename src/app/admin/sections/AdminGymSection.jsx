@@ -260,7 +260,7 @@ export default function AdminGymSection() {
 
   const filtered = items
     .filter(i => fd === "all" || i.jour === fd)
-    .filter(i => fdDisc === "all" || i.discipline === fdDisc)
+    .filter(i => fdDiscs.size === 0 || fdDiscs.has(i.discipline))
 
   const blank = { jour: "lundi", heureDebut: "09:00", heureFin: "10:00", discipline: "", animateur: "", salle: "", niveau: "tous", actif: true, disc: "pilates", complet: false, tag: '', recurrence: { type: 'weekly' } }
 

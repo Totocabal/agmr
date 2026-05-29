@@ -47,7 +47,7 @@ export default async function HomePage() {
                 <em>{hero.titre_ligne2 ?? 'respirez ensemble.'}</em>
               </h1>
               <p className="hero-sub" style={{ whiteSpace: 'pre-line' }}>
-                {hero.sous_titre ?? 'Gymnastique, randonnee, marche nordique.\nDans un esprit de detente et de convivialite.'}
+                {hero.sous_titre ?? 'Gymnastique, randonnée, marche nordique.\nDans un esprit de détente et de convivialité.'}
               </p>
               <div className="hero-actions">
                 <Link className="btn btn-primary btn-lg" href={hero.cta1_lien ?? '/inscriptions'}>

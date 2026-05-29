@@ -1,3 +1,5 @@
+import Icon from '@/components/ui/Icon'
+
 export default function AdminGuideSection() {
   return (
     <div style={{ maxWidth: 860 }}>

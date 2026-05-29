@@ -168,10 +168,11 @@ export default function AdminAccessSection() {
       </div>
 
       {/* Info box */}
-      <div style={{ marginTop: 24, padding: "14px 18px", background: "var(--bg-deep)", borderRadius: "var(--r-sm)", fontSize: "0.84rem", color: "var(--ink-mute)", border: "1px solid var(--line)" }}>
-        <strong style={{ color: "var(--ink-soft)" }}>Création de compte :</strong> renseignez l'email, choisissez un mot de passe temporaire (ou générez-en un), puis communiquez-le à la personne.
-        Elle se connecte sur <code>/admin</code> et peut modifier son mot de passe depuis les paramètres.
-        Un <em>super admin</em> a accès à tout. Un <em>admin classique</em> n'accède qu'aux sections cochées.
+      <div style={{ marginTop: 24, padding: "16px 20px", background: "var(--bg-deep)", borderRadius: "var(--r-sm)", fontSize: "0.86rem", color: "var(--ink-soft)", border: "1px solid var(--line)", lineHeight: 1.7, display: "flex", flexDirection: "column", gap: 8 }}>
+        <div><strong style={{ color: "var(--ink)" }}>Créer un compte</strong> — renseignez l'email, le nom, le rôle et les permissions, puis générez ou saisissez un mot de passe temporaire. Copiez-le et communiquez-le à la personne. Elle se connecte directement sur <code style={{ background: "var(--bg-card)", padding: "1px 5px", borderRadius: 3 }}>/admin</code>.</div>
+        <div><strong style={{ color: "var(--ink)" }}>Réinitialiser un mot de passe</strong> — bouton « Mot de passe » sur chaque ligne (non disponible pour les super admins).</div>
+        <div><strong style={{ color: "var(--ink)" }}>Supprimer un compte</strong> — supprime à la fois l'accès admin et le compte de connexion. Les super admins ne peuvent pas se supprimer mutuellement.</div>
+        <div><strong style={{ color: "var(--ink)" }}>Rôles</strong> — <em>Super admin</em> : accès complet à tout le back-office. <em>Admin classique</em> : accès limité aux sections cochées uniquement.</div>
       </div>
 
       {/* Modal reset mot de passe */}

@@ -144,7 +144,16 @@ export default function AdminAccessSection() {
               )}
             </div>
             {/* Actions */}
-            <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+            <div style={{ display: "flex", gap: 6, flexShrink: 0, alignItems: "center" }}>
+              {a.role !== 'super_admin' && (
+                <button
+                  className="btn btn-ghost btn-sm"
+                  onClick={() => setResetTarget({ email: a.email, name: a.display_name || a.email })}
+                  title="Réinitialiser le mot de passe"
+                >
+                  <Icon name="lock" size={13}/> Mot de passe
+                </button>
+              )}
               <button className="icon-btn" onClick={() => setEditing(a)}><Icon name="edit" size={14}/></button>
               <button className="icon-btn" onClick={() => deleteAdmin(a.id, a.email)} style={{ color: "var(--accent)" }}><Icon name="trash" size={14}/></button>
             </div>

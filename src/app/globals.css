@@ -1832,6 +1832,11 @@ img { max-width: 100%; display: block; }
   .kpi-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
   .tbl th, .tbl td { padding: 10px 12px; font-size: 0.88rem; }
 
+  /* Sejours page cards */
+  .sejour-page-card { grid-template-columns: 1fr; }
+  .sejour-page-img  { min-height: 180px; aspect-ratio: 16/7; }
+  .sejour-page-status { border-left: none; border-top: 1px solid var(--line-soft); min-width: 0; align-items: flex-start; flex-direction: row; flex-wrap: wrap; padding: 14px 20px; }
+
   /* News feature */
   .news-feature-body { padding: 20px 22px 24px; }
   .news-feature-body h3 { font-size: 1.5rem; }

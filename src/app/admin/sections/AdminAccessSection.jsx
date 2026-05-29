@@ -203,14 +203,34 @@ export default function AdminAccessSection() {
   )
 }
 
+/** Génère un mot de passe temporaire lisible : Mot-XXXX-#### */
+function genPassword() {
+  const words = ['Agmr','Gym','Rando','Marche','Sport','Club','Equipe']
+  const word   = words[Math.floor(Math.random() * words.length)]
+  const chars  = 'abcdefghjkmnpqrstuvwxyz'
+  const suffix = Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join('')
+  const num    = String(Math.floor(Math.random() * 900) + 100)
+  return `${word}-${suffix}${num}!`
+}
+
 function AdminForm({ item, onSave, onCancel }) {
+  const isNew = !item.id
   const [f, setF] = useState({
     id:           item.id,
     email:        item.email,
     display_name: item.display_name ?? '',
     role:         item.role,
     permissions:  Array.isArray(item.permissions) ? [...item.permissions] : [],
+    password:     isNew ? genPassword() : '',
   })
+  const [copied, setCopied] = useState(false)
+  const [showPwd, setShowPwd] = useState(false)
+
+  const copyPwd = () => {
+    navigator.clipboard.writeText(f.password)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
 
   const togglePerm = (id) => {
     setF(p => ({

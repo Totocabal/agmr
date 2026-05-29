@@ -56,10 +56,10 @@ const RATIOS = [
 ]
 
 // ── Modal de recadrage ────────────────────────────────────────
-function CropModal({ src, onConfirm, onCancel }) {
+function CropModal({ src, onConfirm, onCancel, defaultAspect = 16 / 9 }) {
   const [crop, setCrop]           = useState({ x: 0, y: 0 })
   const [zoom, setZoom]           = useState(1)
-  const [ratio, setRatio]         = useState(16 / 9)
+  const [ratio, setRatio]         = useState(defaultAspect)
   const [croppedPixels, setCroppedPixels] = useState(null)
   const [loading, setLoading]     = useState(false)
 

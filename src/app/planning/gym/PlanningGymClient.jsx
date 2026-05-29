@@ -475,33 +475,128 @@ export default function PlanningGymClient({ courses, vacances = [] }) {
           </div>
         </div>
 
-        {/* ── Info cards ── */}
-        <div style={{ marginTop: 32, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
-          <div style={{ background: "var(--bg-card)", border: "1px solid var(--line)", borderRadius: "var(--r-md)", padding: 24 }}>
-            <h4 style={{ marginBottom: 12 }}>Les 5 salles</h4>
-            <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 8, fontSize: "0.92rem", color: "var(--ink-soft)" }}>
-              <li><strong>La Ruche</strong> — La Clairière</li>
-              <li><strong>Catherine de Vivonne</strong></li>
-              <li><strong>Dreyfus</strong> — Stationnement salle Patenôtre (disque obligatoire)</li>
-              <li><strong>Gymnase du Bel-Air</strong></li>
-              <li><strong>Maison des Associations</strong></li>
-            </ul>
+      {/* ── Info cards ── */}
+      <div style={{ marginTop: 32, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
+        <div style={{ background: "var(--bg-card)", border: "1px solid var(--line)", borderRadius: "var(--r-md)", padding: 24 }}>
+          <h4 style={{ marginBottom: 12 }}>Les 5 salles</h4>
+          <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 8, fontSize: "0.92rem", color: "var(--ink-soft)" }}>
+            <li><strong>La Ruche</strong> — La Clairière</li>
+            <li><strong>Catherine de Vivonne</strong></li>
+            <li><strong>Dreyfus</strong> — Stationnement salle Patenôtre (disque obligatoire)</li>
+            <li><strong>Gymnase du Bel-Air</strong></li>
+            <li><strong>Maison des Associations</strong></li>
+          </ul>
+        </div>
+        <div style={{ background: "var(--accent-tint)", border: "1px solid var(--accent-soft)", borderRadius: "var(--r-md)", padding: 24 }}>
+          <h4 style={{ marginBottom: 10 }}>Rappel</h4>
+          <p style={{ margin: 0, fontSize: "0.94rem", color: "var(--ink-soft)" }}>
+            Il n'y a <strong>pas de cours pendant les vacances scolaires</strong>.
+            Des stages spécifiques sont régulièrement organisés.
+          </p>
+        </div>
+      </div>
+
+      {/* ── Légende ── */}
+      <div style={{ marginTop: 16, display: 'flex', gap: 16, flexWrap: 'wrap', fontSize: '0.82rem', color: 'var(--ink-mute)' }}>
+        <span><span className="slot-badge badge-complet">C</span> Complet — inscription non disponible</span>
+        <span><span className="slot-badge badge-nouveau">N</span> Nouveau cours cette saison</span>
+        <span><span className="slot-badge badge-apa">APA</span> Activité Physique Adaptée (sur ordonnance)</span>
+      </div>
+    </>
+  )
+
+  // ── Render ─────────────────────────────────────────────────────
+  return (
+    <section className="section">
+      <div className="container">
+
+        {/* ── DESKTOP : grille complète ── */}
+        <div className="planning-desktop-only">
+          {gridJSX}
+        </div>
+
+        {/* ── MOBILE : bouton plein écran ── */}
+        <div className="planning-mobile-btn" style={{ flexDirection: 'column', gap: 20 }}>
+
+          {/* Semaine courante */}
+          <div style={{ background: 'var(--bg-card)', border: '1px solid var(--line)', borderRadius: 'var(--r-md)', padding: '18px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div>
+              <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.12em', color: 'var(--ink-mute)', fontWeight: 600, marginBottom: 4 }}>Semaine en cours</div>
+              <div style={{ fontFamily: 'var(--serif)', fontSize: '1.1rem', fontWeight: 600 }}>{weekLabel}</div>
+            </div>
+            <div className="week-nav">
+              <button className="icon-btn" onClick={() => setWeekOffset(weekOffset - 1)}><Icon name="chevronLeft" size={16}/></button>
+              <button className="icon-btn" onClick={() => setWeekOffset(weekOffset + 1)}><Icon name="chevronRight" size={16}/></button>
+            </div>
           </div>
-          <div style={{ background: "var(--accent-tint)", border: "1px solid var(--accent-soft)", borderRadius: "var(--r-md)", padding: 24 }}>
-            <h4 style={{ marginBottom: 10 }}>Rappel</h4>
-            <p style={{ margin: 0, fontSize: "0.94rem", color: "var(--ink-soft)" }}>
-              Il n'y a <strong>pas de cours pendant les vacances scolaires</strong>.
-              Des stages spécifiques sont régulièrement organisés.
-            </p>
+
+          {/* CTA plein écran */}
+          <button
+            onClick={fullscreen.open}
+            style={{
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+              gap: 14, padding: '36px 24px',
+              background: 'var(--green)', color: '#fff',
+              border: 'none', borderRadius: 'var(--r-md)',
+              cursor: 'pointer', width: '100%',
+              fontFamily: 'inherit',
+            }}
+          >
+            <span style={{ fontSize: '2.4rem' }}>📅</span>
+            <div>
+              <div style={{ fontFamily: 'var(--serif)', fontSize: '1.4rem', fontWeight: 600, marginBottom: 4 }}>Voir le planning</div>
+              <div style={{ fontSize: '0.88rem', opacity: 0.8 }}>Affichage plein écran · orientation paysage</div>
+            </div>
+          </button>
+
+          {/* Rappel vacances si applicable */}
+          {(() => {
+            const vacNames = [...new Set(DAYS.map((_, di) => {
+              const d = new Date(monday); d.setDate(d.getDate() + di)
+              return getVacationForDay(d, vacances)?.nom
+            }).filter(Boolean))]
+            return vacNames.length > 0 ? (
+              <div style={{ padding: '12px 16px', background: '#fef9ec', border: '1px solid #f0d060', borderRadius: 'var(--r-sm)', display: 'flex', alignItems: 'center', gap: 10, fontSize: '0.88rem', color: '#7a6010' }}>
+                <span>🏖️</span>
+                <span><strong>Vacances scolaires</strong> — pas de cours cette semaine.</span>
+              </div>
+            ) : null
+          })()}
+
+          {/* Info salles condensé */}
+          <div style={{ background: 'var(--bg-card)', border: '1px solid var(--line)', borderRadius: 'var(--r-md)', padding: '16px 18px', fontSize: '0.88rem', color: 'var(--ink-soft)' }}>
+            <strong style={{ display: 'block', marginBottom: 8, color: 'var(--ink)' }}>5 salles · 43h/semaine</strong>
+            La Ruche, Catherine de Vivonne, Dreyfus, Gymnase du Bel-Air, Maison des Associations
           </div>
         </div>
 
-        {/* ── Légende ── */}
-        <div style={{ marginTop: 16, display: 'flex', gap: 16, flexWrap: 'wrap', fontSize: '0.82rem', color: 'var(--ink-mute)' }}>
-          <span><span className="slot-badge badge-complet">C</span> Complet — inscription non disponible</span>
-          <span><span className="slot-badge badge-nouveau">N</span> Nouveau cours cette saison</span>
-          <span><span className="slot-badge badge-apa">APA</span> Activité Physique Adaptée (sur ordonnance)</span>
-        </div>
+        {/* ── OVERLAY plein écran ── */}
+        {fullscreen.isOpen && (
+          <div style={{
+            position: 'fixed', inset: 0, zIndex: 9999,
+            background: 'var(--bg-card)',
+            overflowY: 'auto', overflowX: 'hidden',
+          }}>
+            {/* Barre de fermeture */}
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              padding: '10px 16px',
+              background: 'var(--green)', color: '#fff',
+              position: 'sticky', top: 0, zIndex: 10,
+            }}>
+              <span style={{ fontFamily: 'var(--serif)', fontSize: '1.1rem', fontWeight: 600 }}>Planning Gym · {weekLabel}</span>
+              <button
+                onClick={fullscreen.close}
+                style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.3)', color: '#fff', borderRadius: 'var(--r-sm)', padding: '6px 14px', cursor: 'pointer', fontFamily: 'inherit', fontSize: '0.88rem', display: 'flex', alignItems: 'center', gap: 6 }}
+              >
+                <Icon name="x" size={14}/> Fermer
+              </button>
+            </div>
+            <div style={{ padding: '12px 12px 24px' }}>
+              {gridJSX}
+            </div>
+          </div>
+        )}
 
       </div>
     </section>

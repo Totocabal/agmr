@@ -313,7 +313,69 @@ function AdminForm({ item, onSave, onCancel }) {
           onClick={() => onSave(f)}
           disabled={!f.email.trim()}
         >
-          Enregistrer
+          {item.id ? 'Enregistrer' : '✉ Envoyer l\'invitation'}
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function ResetPasswordForm({ target, onSave, onCancel }) {
+  const [pwd, setPwd]       = useState('')
+  const [pwd2, setPwd2]     = useState('')
+  const [show, setShow]     = useState(false)
+  const [saving, setSaving] = useState(false)
+
+  const valid = pwd.length >= 8 && pwd === pwd2
+
+  const submit = async () => {
+    if (!valid) return
+    setSaving(true)
+    await onSave(pwd)
+    setSaving(false)
+  }
+
+  return (
+    <div className="form">
+      <div style={{ padding: "10px 14px", background: "var(--bg-deep)", borderRadius: "var(--r-sm)", fontSize: "0.86rem", color: "var(--ink-mute)", marginBottom: 4 }}>
+        Définissez un nouveau mot de passe pour <strong style={{ color: "var(--ink)" }}>{target.email}</strong>.
+        La personne pourra le modifier ensuite depuis ses paramètres.
+      </div>
+      <div className="field">
+        <label>Nouveau mot de passe</label>
+        <div style={{ position: "relative" }}>
+          <input
+            type={show ? "text" : "password"}
+            value={pwd}
+            onChange={e => setPwd(e.target.value)}
+            placeholder="8 caractères minimum"
+            style={{ paddingRight: 40 }}
+          />
+          <button type="button" onClick={() => setShow(s => !s)}
+            style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--ink-mute)", fontSize: "0.8rem" }}>
+            {show ? '🙈' : '👁'}
+          </button>
+        </div>
+        {pwd.length > 0 && pwd.length < 8 && (
+          <span style={{ fontSize: "0.78rem", color: "var(--accent)" }}>Trop court — 8 caractères minimum</span>
+        )}
+      </div>
+      <div className="field">
+        <label>Confirmer le mot de passe</label>
+        <input
+          type={show ? "text" : "password"}
+          value={pwd2}
+          onChange={e => setPwd2(e.target.value)}
+          placeholder="Répéter le mot de passe"
+        />
+        {pwd2.length > 0 && pwd !== pwd2 && (
+          <span style={{ fontSize: "0.78rem", color: "var(--accent)" }}>Les mots de passe ne correspondent pas</span>
+        )}
+      </div>
+      <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 8 }}>
+        <button className="btn btn-ghost" onClick={onCancel}>Annuler</button>
+        <button className="btn btn-primary" onClick={submit} disabled={!valid || saving}>
+          {saving ? 'Modification…' : 'Modifier le mot de passe'}
         </button>
       </div>
     </div>

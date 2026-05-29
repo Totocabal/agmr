@@ -1694,6 +1694,29 @@ img { max-width: 100%; display: block; }
 }
 .mobile-menu-actions .btn { justify-content: center; }
 
+/* ===== Sejours page cards ===== */
+.sejour-page-card {
+  background: var(--bg-card);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r-md);
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 200px 1fr auto;
+  align-items: stretch;
+}
+.sejour-page-img  { min-height: 160px; }
+.sejour-page-body { padding: 22px 28px; }
+.sejour-page-status {
+  padding: 22px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 10px;
+  border-left: 1px solid var(--line-soft);
+  min-width: 160px;
+}
+
 /* ── Responsive 1024px ── */
 @media (max-width: 1024px) {
   h1 { font-size: 2.6rem; }

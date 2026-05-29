@@ -65,7 +65,7 @@ export default function AdminGuideSection() {
         />
 
         <GuideBlock
-          icon="📰"
+          icon={<Icon name="file" size={18}/>}
           title="Actualités"
           section="Contenus → Actualités"
           items={[

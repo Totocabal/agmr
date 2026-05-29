@@ -32,7 +32,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="fr">
-      <body className={`${cormorant.variable} ${sourceSans.variable}`}>
+      <body className={`${cormorant.variable} ${sourceSans.variable} ${inter.variable}`}>
         {children}
       </body>
     </html>

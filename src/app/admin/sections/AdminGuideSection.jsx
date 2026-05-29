@@ -87,7 +87,7 @@ export default function AdminGuideSection() {
         />
 
         <GuideBlock
-          icon="🖼️"
+          icon={<Icon name="image" size={18}/>}
           title="Galerie photos"
           section="Contenus → Galerie"
           items={[

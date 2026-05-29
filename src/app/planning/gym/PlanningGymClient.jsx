@@ -269,24 +269,24 @@ export default function PlanningGymClient({ courses, vacances = [] }) {
     return out
   }, [visible])
 
-  // ── Shared grid content (toolbar + grid + info) ──────────────
-  const planningContent = (isFullscreen = false) => (
+  // ── Grid JSX (partagé desktop + plein écran) ─────────────────
+  const gridJSX = (
     <>
       {/* ── Toolbar ── */}
-      <div className="planning-toolbar" style={isFullscreen ? { marginBottom: 12 } : undefined}>
-          <div className="week-nav">
-            <button className="icon-btn" onClick={() => setWeekOffset(weekOffset - 1)}><Icon name="chevronLeft" size={16}/></button>
-            <button className="icon-btn" onClick={() => setWeekOffset(weekOffset + 1)}><Icon name="chevronRight" size={16}/></button>
-          </div>
-          <div className="planning-week">Semaine du {weekLabel}</div>
-          {weekOffset !== 0 && (
-            <button className="btn btn-ghost btn-sm" onClick={() => setWeekOffset(0)}>Aujourd'hui</button>
-          )}
-          <DiscDropdown disciplines={disciplines} selected={selected} onChange={setSelected}/>
-          <button className="btn btn-ghost btn-sm" onClick={() => exportPDF(visible, weekLabel)}>
-            <Icon name="download" size={14}/> PDF
-          </button>
+      <div className="planning-toolbar">
+        <div className="week-nav">
+          <button className="icon-btn" onClick={() => setWeekOffset(weekOffset - 1)}><Icon name="chevronLeft" size={16}/></button>
+          <button className="icon-btn" onClick={() => setWeekOffset(weekOffset + 1)}><Icon name="chevronRight" size={16}/></button>
         </div>
+        <div className="planning-week">Semaine du {weekLabel}</div>
+        {weekOffset !== 0 && (
+          <button className="btn btn-ghost btn-sm" onClick={() => setWeekOffset(0)}>Aujourd'hui</button>
+        )}
+        <DiscDropdown disciplines={disciplines} selected={selected} onChange={setSelected}/>
+        <button className="btn btn-ghost btn-sm" onClick={() => exportPDF(visible, weekLabel)}>
+          <Icon name="download" size={14}/> PDF
+        </button>
+      </div>
 
         {/* ── Bannière vacances si la semaine est concernée ── */}
         {(() => {

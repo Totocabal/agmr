@@ -38,7 +38,12 @@ export default async function SejoursPage() {
             <div style={{ display: "flex", flexDirection: "column", gap: 20, marginBottom: 64 }}>
               {sejours.map(s => (
                 <div key={s.id} className="sejour-page-card">
-                  <div className="sejour-page-img" style={{ background: IMG_STYLES[s.img] || IMG_STYLES.a }}/>
+                  <div className="sejour-page-img" style={{
+                    background: IMG_STYLES[s.img] || IMG_STYLES.a,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    ...(s.image_url ? { backgroundImage: `url(${s.image_url})` } : {}),
+                  }}/>
                   <div className="sejour-page-body">
                     <div style={{ fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--accent)", marginBottom: 6 }}>
                       {s.transport}

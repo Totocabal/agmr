@@ -92,9 +92,15 @@ export default function AdminAccessSection() {
     return true
   }
 
-  const deleteAdmin = async (id, email) => {
-    if (!confirm(`Révoquer l'accès de ${email} ?`)) return
-    await supabase.from('admin_profiles').delete().eq('id', id)
+  const deleteAdmin = async (id, email, role) => {
+    if (!confirm(`Supprimer le compte de ${email} ?\n\nCette action supprime l'accès admin ET le compte de connexion.`)) return
+    const res = await fetch('/api/admin/delete-user', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ targetEmail: email }),
+    })
+    const json = await res.json()
+    if (!res.ok) { alert('Erreur : ' + (json.error ?? 'Inconnue')); return }
     load()
   }
 

@@ -299,27 +299,12 @@ export default function AdminGymSection() {
         </div>
         <div className="admin-filter-row" style={{ alignItems: 'center' }}>
           <div className="admin-filter-label">Discipline</div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <select
-              value={fdDisc}
-              onChange={e => setFdDisc(e.target.value)}
-              style={{ padding: '7px 12px', border: '1px solid var(--line-strong)', borderRadius: 'var(--r-sm)', fontFamily: 'inherit', fontSize: '0.9rem', background: 'var(--bg-card)', color: 'var(--ink)', cursor: 'pointer', minWidth: 260 }}
-            >
-              <option value="all">Toutes les disciplines ({items.length})</option>
-              {disciplines.map(d => (
-                <option key={d} value={d}>{d} ({disciplineCounts[d] ?? 0})</option>
-              ))}
-            </select>
-            {fdDisc !== "all" && (
-              <button
-                className="btn btn-ghost btn-sm"
-                onClick={() => setFdDisc("all")}
-                style={{ color: 'var(--ink-mute)' }}
-              >
-                ✕ Effacer
-              </button>
-            )}
-          </div>
+          <DisciplineFilter
+            disciplines={disciplines}
+            counts={disciplineCounts}
+            selected={fdDiscs}
+            onChange={setFdDiscs}
+          />
         </div>
       </div>
 

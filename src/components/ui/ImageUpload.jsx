@@ -84,6 +84,7 @@ const RATIOS = [
 function CropModal({ src, onConfirm, onCancel, defaultAspect = 16 / 9 }) {
   const [crop, setCrop]           = useState({ x: 0, y: 0 })
   const [zoom, setZoom]           = useState(1)
+  const [rotation, setRotation]   = useState(0)
   const [ratio, setRatio]         = useState(defaultAspect)
   const [croppedPixels, setCroppedPixels] = useState(null)
   const [loading, setLoading]     = useState(false)
@@ -94,7 +95,7 @@ function CropModal({ src, onConfirm, onCancel, defaultAspect = 16 / 9 }) {
     if (!croppedPixels) return
     setLoading(true)
     try {
-      const blob    = await getCroppedBlob(src, croppedPixels)
+      const blob    = await getCroppedBlob(src, croppedPixels, rotation)
       const resized = await resizeBlob(blob, 1400)
       onConfirm(resized)
     } catch (e) {

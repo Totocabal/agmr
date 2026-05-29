@@ -114,7 +114,7 @@ export default function AdminGuideSection() {
         />
 
         <GuideBlock
-          icon="📄"
+          icon={<Icon name="file" size={18}/>}
           title="Assemblée Générale"
           section="Association → Assemblée générale"
           items={[

@@ -392,7 +392,13 @@ export default function AdminGalerieSection() {
                 <div style={{ aspectRatio: '16/9', background: 'var(--bg-deep)', overflow: 'hidden', position: 'relative' }}>
                   {cover
                     ? <img src={cover.url} alt={albumName} style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>
-                    : <div style={{ width: '100%', height: '100%', display: 'grid', placeItems: 'center', color: 'var(--ink-mute)', fontSize: '2rem' }}>🖼️</div>
+                    : <div style={{ width: '100%', height: '100%', display: 'grid', placeItems: 'center' }}>
+                        <svg width="40" height="34" viewBox="0 0 40 34" fill="none" style={{ opacity: 0.3 }}>
+                          <rect x="1" y="1" width="38" height="32" rx="3" stroke="var(--ink)" strokeWidth="1.5" fill="none"/>
+                          <circle cx="12" cy="11" r="3.5" fill="var(--ink)"/>
+                          <path d="M1 24 L12 14 L20 22 L28 14 L39 24" stroke="var(--ink)" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </div>
                   }
                 </div>
                 {/* Infos */}

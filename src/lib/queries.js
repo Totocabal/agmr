@@ -378,6 +378,16 @@ export async function getVacances() {
   }))
 }
 
+export async function getTarifs() {
+  const { data, error } = await supabase
+    .from('tarifs')
+    .select('*')
+    .order('categorie')
+    .order('ordre')
+  if (error) { console.error(error); return [] }
+  return data
+}
+
 export async function getGaleriePhotos() {
   const { data, error } = await supabase
     .from('galerie_photos')

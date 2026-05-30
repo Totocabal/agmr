@@ -152,7 +152,7 @@ function VacancesForm({ item, onSave, onCancel }) {
   return (
     <div className="form">
       <div className="field">
-        <label>Nom de la période</label>
+        <label>Nom de la période <HelpTip text="Un nom descriptif pour identifier facilement la période. Exemple : 'Vacances de Toussaint 2025' ou 'Noël 2025-2026'." position="right" /></label>
         <input value={f.nom} onChange={e => u('nom', e.target.value)} placeholder="Vacances de Noël 2025-2026"/>
       </div>
       <div className="row-2">

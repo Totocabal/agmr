@@ -992,6 +992,48 @@ img { max-width: 100%; display: block; }
   flex: 1;
 }
 .week-nav { display: flex; gap: 4px; }
+.planning-zoom {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+}
+.planning-zoom .icon-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 3px;
+}
+.planning-zoom .icon-btn:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+}
+.planning-zoom .icon-btn:disabled:hover {
+  background: var(--bg-card);
+  color: var(--ink);
+  border-color: var(--line-strong);
+}
+.planning-zoom-value {
+  width: 52px;
+  height: 32px;
+  display: inline-grid;
+  place-items: center;
+  background: var(--bg-elev);
+  border: 1px solid var(--line-soft);
+  border-radius: 3px;
+  color: var(--ink-soft);
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+.planning-zoom-value:hover {
+  color: var(--accent);
+  border-color: var(--accent-soft);
+}
 .icon-btn {
   width: 38px;
   height: 38px;

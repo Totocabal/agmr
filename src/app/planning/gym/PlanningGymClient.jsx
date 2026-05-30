@@ -8,12 +8,13 @@ const HOUR_PX = 64
 const START_H = 8
 const END_H   = 21
 const HOURS   = Array.from({ length: END_H - START_H }, (_, i) => START_H + i)
-const GRID_H  = (END_H - START_H) * HOUR_PX
 const TIME_W  = 52   // px
+const ZOOM_LEVELS = [0.75, 0.9, 1, 1.15, 1.3, 1.5]
+const DEFAULT_ZOOM_INDEX = 2
 
 function toMin(t)        { const [h, m] = t.split(':').map(Number); return h * 60 + m }
-function slotTop(s)      { return (toMin(s) - START_H * 60) * (HOUR_PX / 60) }
-function slotHeight(s,e) { return (toMin(e) - toMin(s)) * (HOUR_PX / 60) }
+function slotTop(s, hourPx)      { return (toMin(s) - START_H * 60) * (hourPx / 60) }
+function slotHeight(s, e, hourPx) { return (toMin(e) - toMin(s)) * (hourPx / 60) }
 
 // ── Recurrence helpers ─────────────────────────────────────────
 const DAY_IDX = { lundi:0, mardi:1, mercredi:2, jeudi:3, vendredi:4, samedi:5 }
@@ -237,7 +238,12 @@ export default function PlanningGymClient({ courses, vacances = [] }) {
   const [weekOffset, setWeekOffset] = useState(0)
   const [selected, setSelected]     = useState(new Set())
   const [clickedId, setClickedId]   = useState(null)
+  const [zoomIndex, setZoomIndex]   = useState(DEFAULT_ZOOM_INDEX)
   const fullscreen = usePlanningFullscreen()
+  const zoom = ZOOM_LEVELS[zoomIndex]
+  const hourPx = Math.round(HOUR_PX * zoom)
+  const gridHeight = (END_H - START_H) * hourPx
+  const zoomLabel = `${Math.round(zoom * 100)}%`
 
   const monday = useMemo(() => {
     const d = new Date()
@@ -280,9 +286,37 @@ export default function PlanningGymClient({ courses, vacances = [] }) {
         </div>
         <div className="planning-week">Semaine du {weekLabel}</div>
         {weekOffset !== 0 && (
-          <button className="btn btn-ghost btn-sm" onClick={() => setWeekOffset(0)}>Aujourd'hui</button>
+          <button className="btn btn-ghost btn-sm" onClick={() => setWeekOffset(0)}>Aujourd&apos;hui</button>
         )}
         <DiscDropdown disciplines={disciplines} selected={selected} onChange={setSelected}/>
+        <div className="planning-zoom" role="group" aria-label="Zoom du planning">
+          <button
+            className="icon-btn"
+            onClick={() => setZoomIndex(i => Math.max(0, i - 1))}
+            disabled={zoomIndex === 0}
+            title="Dézoomer"
+            aria-label="Dézoomer le planning"
+          >
+            <Icon name="minus" size={15}/>
+          </button>
+          <button
+            className="planning-zoom-value"
+            onClick={() => setZoomIndex(DEFAULT_ZOOM_INDEX)}
+            title="Réinitialiser le zoom"
+            aria-label="Réinitialiser le zoom du planning"
+          >
+            {zoomLabel}
+          </button>
+          <button
+            className="icon-btn"
+            onClick={() => setZoomIndex(i => Math.min(ZOOM_LEVELS.length - 1, i + 1))}
+            disabled={zoomIndex === ZOOM_LEVELS.length - 1}
+            title="Zoomer"
+            aria-label="Zoomer le planning"
+          >
+            <Icon name="plus" size={15}/>
+          </button>
+        </div>
         <button className="btn btn-ghost btn-sm" onClick={() => exportPDF(visible, weekLabel)}>
           <Icon name="download" size={14}/> PDF
         </button>
@@ -339,7 +373,7 @@ export default function PlanningGymClient({ courses, vacances = [] }) {
             {/* Time labels */}
             <div style={{ width: TIME_W, flexShrink: 0, borderRight: '1px solid var(--line)', background: 'var(--bg-deep)' }}>
               {HOURS.map((h, i) => (
-                <div key={h} style={{ height: HOUR_PX, display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-end', paddingRight: 10 }}>
+                <div key={h} style={{ height: hourPx, display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-end', paddingRight: 10 }}>
                   <span style={{ fontSize: '0.66rem', color: 'var(--ink-mute)', marginTop: i === 0 ? 4 : -8, fontVariantNumeric: 'tabular-nums' }}>
                     {h}:00
                   </span>
@@ -352,11 +386,11 @@ export default function PlanningGymClient({ courses, vacances = [] }) {
 
               {/* Hour lines */}
               {HOURS.map((_, i) => (
-                <div key={`hl-${i}`} style={{ position: 'absolute', left: 0, right: 0, top: i * HOUR_PX, borderTop: `1px solid rgba(0,0,0,${i === 0 ? 0.12 : 0.06})`, zIndex: 1, pointerEvents: 'none' }}/>
+                <div key={`hl-${i}`} style={{ position: 'absolute', left: 0, right: 0, top: i * hourPx, borderTop: `1px solid rgba(0,0,0,${i === 0 ? 0.12 : 0.06})`, zIndex: 1, pointerEvents: 'none' }}/>
               ))}
               {/* Half-hour lines */}
               {HOURS.map((_, i) => (
-                <div key={`hh-${i}`} style={{ position: 'absolute', left: 0, right: 0, top: i * HOUR_PX + HOUR_PX / 2, borderTop: '1px dashed rgba(0,0,0,0.04)', zIndex: 1, pointerEvents: 'none' }}/>
+                <div key={`hh-${i}`} style={{ position: 'absolute', left: 0, right: 0, top: i * hourPx + hourPx / 2, borderTop: '1px dashed rgba(0,0,0,0.04)', zIndex: 1, pointerEvents: 'none' }}/>
               ))}
 
               {/* Day columns */}
@@ -372,7 +406,7 @@ export default function PlanningGymClient({ courses, vacances = [] }) {
                     onClick={() => setClickedId(null)}
                     style={{
                       position: 'relative',
-                      height: GRID_H,
+                      height: gridHeight,
                       borderLeft: di > 0 ? '1px solid var(--line)' : 'none',
                       background: vacation
                         ? 'repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(0,0,0,0.018) 8px, rgba(0,0,0,0.018) 16px)'
@@ -392,8 +426,8 @@ export default function PlanningGymClient({ courses, vacances = [] }) {
                     )}
 
                     {laid.map(s => {
-                      const top   = slotTop(s.heureDebut)
-                      const baseH = Math.max(slotHeight(s.heureDebut, s.heureFin), 18)
+                      const top   = slotTop(s.heureDebut, hourPx)
+                      const baseH = Math.max(slotHeight(s.heureDebut, s.heureFin, hourPx), 18)
                       const isHov = clickedId === s.id
                       const pct   = 100 / s._numCols
                       const GAP   = 2   // px between side-by-side cards
@@ -490,7 +524,7 @@ export default function PlanningGymClient({ courses, vacances = [] }) {
         <div style={{ background: "var(--accent-tint)", border: "1px solid var(--accent-soft)", borderRadius: "var(--r-md)", padding: 24 }}>
           <h4 style={{ marginBottom: 10 }}>Rappel</h4>
           <p style={{ margin: 0, fontSize: "0.94rem", color: "var(--ink-soft)" }}>
-            Il n'y a <strong>pas de cours pendant les vacances scolaires</strong>.
+            Il n&apos;y a <strong>pas de cours pendant les vacances scolaires</strong>.
             Des stages spécifiques sont régulièrement organisés.
           </p>
         </div>

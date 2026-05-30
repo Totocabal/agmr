@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import AGMRLogo from '@/components/ui/AGMRLogo'
 import Icon from '@/components/ui/Icon'
 import { createClient } from '@/lib/supabase-client'
+import FontSizeWidget from '@/components/ui/FontSizeWidget'
 
 function toMin(t) { const [h, m] = t.split(':').map(Number); return h * 60 + m }
 
@@ -91,6 +92,7 @@ export default function Header() {
   }, [menuOpen])
 
   return (
+    <>
     <header className="header">
       <div className="header-inner">
         <Link className="logo-link" href="/">
@@ -210,5 +212,7 @@ export default function Header() {
         </div>
       </div>
     </header>
+    <FontSizeWidget/>
+    </>
   )
 }

@@ -91,7 +91,7 @@ export default function AdminRandoPageSection() {
     <>
       <div className="admin-head">
         <div>
-          <h1>Page Randonnée</h1>
+          <h1>Page Randonnée <HelpTip text="Gérez le contenu de la page publique Randonnée : les textes de présentation, les informations sur les sorties du jeudi et du dimanche, et les groupes de niveau du jeudi (distance, horaire, point de RDV)." position="right" /></h1>
           <p className="muted" style={{ margin: 0 }}>Contenu, groupes du jeudi</p>
         </div>
         <a className="btn btn-ghost btn-sm" href="/activites/randonnee" target="_blank" rel="noopener noreferrer">

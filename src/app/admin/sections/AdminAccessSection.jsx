@@ -111,7 +111,7 @@ export default function AdminAccessSection() {
     <>
       <div className="admin-head">
         <div>
-          <h1>Gestion des accès</h1>
+          <h1>Gestion des accès <HelpTip text="Cette section vous permet de créer des comptes pour les personnes autorisées à accéder au back-office, de définir ce qu'elles peuvent voir et modifier, et de supprimer leurs accès si nécessaire." position="right" /></h1>
           <p className="muted" style={{ margin: 0 }}>Administrateurs et leurs permissions</p>
         </div>
         <button className="btn btn-primary" onClick={() => setAdding(true)}>

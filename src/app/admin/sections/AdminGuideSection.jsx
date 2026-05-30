@@ -7,7 +7,7 @@ export default function AdminGuideSection() {
 
       <div className="admin-head">
         <div>
-          <h1>Guide d'utilisation</h1>
+          <h1>Guide d'utilisation <HelpTip text="Ce guide explique comment utiliser chaque section du back-office. Lisez-le une première fois pour vous familiariser avec l'outil. Vous pouvez y revenir à tout moment." position="right" /></h1>
           <p className="muted" style={{ margin: 0 }}>Back-office AGMR · Saison 2025-2026</p>
         </div>
       </div>

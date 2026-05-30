@@ -108,7 +108,7 @@ export default function AdminComiteSection() {
         <>
           <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}>
             <button className="btn btn-primary" onClick={() => setEditingB({ nom: '', role: '', groupe: 'Membres du bureau', photo_url: '' })}>
-              <Icon name="plus" size={14}/> Ajouter un membre
+              <Icon name="plus" size={14}/> Ajouter un membre <HelpTip text="Ajoute une personne au bureau de l'association. Renseignez son nom, son rôle (ex : Président, Trésorière) et son groupe (Bureau exécutif, Membres du bureau…). La photo est optionnelle." position="bottom" />
             </button>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>

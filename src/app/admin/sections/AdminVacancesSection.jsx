@@ -82,7 +82,7 @@ export default function AdminVacancesSection() {
     <>
       <div className="admin-head">
         <div>
-          <h1>Vacances scolaires</h1>
+          <h1>Vacances scolaires <HelpTip text="Renseignez ici les périodes de vacances scolaires. Pendant ces périodes, les cours sont automatiquement masqués dans le planning gym public. La Zone C correspond à l'Île-de-France (Rambouillet)." position="right" /></h1>
           <p className="muted" style={{ margin: 0 }}>Périodes sans cours · Zone C (Île-de-France)</p>
         </div>
         <button className="btn btn-primary" onClick={() => setEditing(blank)}>

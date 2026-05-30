@@ -27,49 +27,43 @@ export default async function GymPage() {
   ])
 
   const bm = Object.fromEntries(blocks.map(b => [b.block_key, b]))
-  const c = (key) => bm[key]?.content ?? {}
   const vis = (key) => bm[key]?.visible !== false
 
-  const header   = c('header')
-  const intro    = c('intro')
-  const prog     = c('programme')
-  const prescri  = c('prescri')
-
-  const discList  = disciplines.length > 0 ? disciplines : DEFAULT_DISCIPLINES
-  const animList  = animateurs
-
-  const progItems = Array.isArray(prog.items) ? prog.items : [
-    '3 cours de gym',
-    '+ 2 cours de yoga / Qi Gong',
-    '+ 2 cours de Pilates',
-  ]
+  const sortedBlocks = blocks
+  const discList = disciplines.length > 0 ? disciplines : DEFAULT_DISCIPLINES
+  const animList = animateurs
 
   return (
     <div className="page-shell">
       <Header/>
       <main className="page-main">
 
-        {/* PAGE HEADER */}
-        {vis('header') && (
-          <div className="page-header">
-            <div className="container">
-              <div className="crumb">
-                <Link href="/">Accueil</Link>
-                <span>/</span>
-                <span>Activités</span>
-                <span>/</span>
-                <span>Gym</span>
+        {/* PAGE HEADER — rendered outside the main section if header block is first/visible */}
+        {sortedBlocks.map(block => {
+          if (!block.visible) return null
+          if (block.block_key !== 'header') return null
+          const content = block.content ?? {}
+          return (
+            <div key="header" className="page-header">
+              <div className="container">
+                <div className="crumb">
+                  <Link href="/">Accueil</Link>
+                  <span>/</span>
+                  <span>Activités</span>
+                  <span>/</span>
+                  <span>Gym</span>
+                </div>
+                <div className="page-header-eyebrow">
+                  {content.eyebrow ?? 'Activités · FFEPGV · Label Qualité Club Sport Santé'}
+                </div>
+                <h1>{content.titre ?? 'La Gym'}</h1>
+                <p className="page-header-lede">
+                  {content.lede ?? '43 heures de cours par semaine, 8 animateurs brevetés professionnels, 5 salles municipales. Construisez votre propre programme.'}
+                </p>
               </div>
-              <div className="page-header-eyebrow">
-                {header.eyebrow ?? 'Activités · FFEPGV · Label Qualité Club Sport Santé'}
-              </div>
-              <h1>{header.titre ?? 'La Gym'}</h1>
-              <p className="page-header-lede">
-                {header.lede ?? '43 heures de cours par semaine, 8 animateurs brevetés professionnels, 5 salles municipales. Construisez votre propre programme.'}
-              </p>
             </div>
-          </div>
-        )}
+          )
+        })}
 
         <section className="section">
           <div className="container">
@@ -89,75 +83,112 @@ export default async function GymPage() {
                 </ul>
               </aside>
 
-              {/* MAIN CONTENT */}
+              {/* MAIN CONTENT — iterated in ordre */}
               <div>
 
-                {/* INTRO */}
-                {vis('intro') && (
-                  <>
-                    <h2 id="intro" style={{ fontSize: "2.2rem", marginBottom: 18 }}>
-                      {intro.titre ?? 'La Gymnastique Volontaire à Rambouillet'}
-                    </h2>
-                    <p style={{ fontSize: "1.12rem", color: "var(--ink-soft)" }}>
-                      {intro.texte1 ?? "Notre section est affiliée à la Fédération Française d'Éducation Physique et de Gymnastique Volontaire (FFEPGV). Elle bénéficie du label Qualité Club Sport Santé."}
-                    </p>
-                    <p>
-                      {intro.texte2 ?? "Tous les cours sont donnés par des animateurs brevetés d'État. Ils proposent 43 heures de cours par semaine, d'une grande variété, répartis dans 5 salles mises à disposition par la municipalité."}
-                    </p>
-                  </>
-                )}
+                {/* Disciplines always shown (not a block) */}
+                {sortedBlocks.map(block => {
+                  if (!block.visible) return null
+                  const content = block.content ?? {}
 
-                {/* DISCIPLINES */}
-                <h3 id="disciplines" style={{ marginTop: vis('intro') ? 48 : 0, fontFamily: "var(--serif)", fontSize: "1.8rem", fontWeight: 500 }}>
-                  Les disciplines
-                </h3>
-                <p className="muted">
-                  {discList.length} discipline{discList.length > 1 ? 's' : ''} pour construire votre programme sur mesure.
-                </p>
-                <div className="disc-list">
-                  {discList.map(d => (
-                    <div key={d.id} className="disc-item">
-                      <div className="disc-item-mark">{d.mark}</div>
-                      <div className="disc-item-text">
-                        <div className="disc-item-name">{d.nom}</div>
-                        <div className="disc-item-desc">{d.description}</div>
+                  switch (block.block_key) {
+                    case 'header':
+                      return null // rendered above
+
+                    case 'intro':
+                      return (
+                        <div key="intro">
+                          <h2 id="intro" style={{ fontSize: "2.2rem", marginBottom: 18 }}>
+                            {content.titre ?? 'La Gymnastique Volontaire à Rambouillet'}
+                          </h2>
+                          <p style={{ fontSize: "1.12rem", color: "var(--ink-soft)" }}>
+                            {content.texte1 ?? "Notre section est affiliée à la Fédération Française d'Éducation Physique et de Gymnastique Volontaire (FFEPGV). Elle bénéficie du label Qualité Club Sport Santé."}
+                          </p>
+                          <p>
+                            {content.texte2 ?? "Tous les cours sont donnés par des animateurs brevetés d'État. Ils proposent 43 heures de cours par semaine, d'une grande variété, répartis dans 5 salles mises à disposition par la municipalité."}
+                          </p>
+                        </div>
+                      )
+
+                    case 'programme': {
+                      const progItems = Array.isArray(content.items) ? content.items : [
+                        '3 cours de gym',
+                        '+ 2 cours de yoga / Qi Gong',
+                        '+ 2 cours de Pilates',
+                      ]
+                      return (
+                        <div key="programme" style={{ marginTop: 40, padding: 28, background: "var(--bg-card)", border: "1px solid var(--line)", borderRadius: "var(--r-md)" }}>
+                          <h3 id="programme" style={{ fontFamily: "var(--serif)", fontSize: "1.5rem", marginBottom: 10 }}>
+                            {content.titre ?? 'Construisez votre propre programme'}
+                          </h3>
+                          <p style={{ margin: 0, color: "var(--ink-soft)" }}>
+                            {content.texte_intro ?? "Vous pouvez assister à 2 ou 3 heures de cours par semaine. L'adhésion vous permet de choisir, parmi les 43 cours proposés, au maximum :"}
+                          </p>
+                          <ul style={{ margin: "12px 0 0 20px", color: "var(--ink-soft)" }}>
+                            {progItems.map((item, i) => <li key={i}>{item}</li>)}
+                          </ul>
+                          {(content.note || !content.titre) && (
+                            <p style={{ marginTop: 14, fontSize: "0.92rem", color: "var(--ink-mute)" }}>
+                              {content.note ?? 'Chaque cours couvre la saison complète, soit environ 34 séances.'}
+                            </p>
+                          )}
+                          <div style={{ marginTop: 20, display: "flex", gap: 12 }}>
+                            <Link className="btn btn-primary" href={content.cta1_lien ?? '/planning/gym'}>
+                              {content.cta1_texte ?? 'Voir le planning'}
+                            </Link>
+                            <Link className="btn btn-ghost" href={content.cta2_lien ?? '/inscriptions'}>
+                              {content.cta2_texte ?? "S'inscrire"}
+                            </Link>
+                          </div>
+                        </div>
+                      )
+                    }
+
+                    case 'prescri':
+                      return (
+                        <div key="prescri" style={{ marginTop: 48, padding: 32, background: "var(--green-tint)", borderRadius: "var(--r-md)" }}>
+                          <h3 id="prescri" style={{ marginBottom: 10 }}>
+                            {content.titre ?? "Prescri'Forme — sport sur ordonnance"}
+                          </h3>
+                          <p style={{ color: "var(--ink-soft)", marginBottom: 14 }}>
+                            {content.texte ?? "L'Association est agréée pour dispenser des cours de gym volontaire sur prescription médicale (dispositif Prescri'Forme, Île-de-France, depuis septembre 2019)."}
+                          </p>
+                          <Link className="btn btn-ghost btn-sm" href={content.cta_lien ?? '/activites/sante'}>
+                            {content.cta_texte ?? 'En savoir plus'}
+                          </Link>
+                        </div>
+                      )
+
+                    default:
+                      return null
+                  }
+                })}
+
+                {/* Disciplines section — always shown, not a block */}
+                <div style={{ marginTop: 48 }}>
+                  <h3 id="disciplines" style={{ fontFamily: "var(--serif)", fontSize: "1.8rem", fontWeight: 500 }}>
+                    Les disciplines
+                  </h3>
+                  <p className="muted">
+                    {discList.length} discipline{discList.length > 1 ? 's' : ''} pour construire votre programme sur mesure.
+                  </p>
+                  <div className="disc-list">
+                    {discList.map(d => (
+                      <div key={d.id} className="disc-item">
+                        <div className="disc-item-mark">{d.mark}</div>
+                        <div className="disc-item-text">
+                          <div className="disc-item-name">{d.nom}</div>
+                          <div className="disc-item-desc">{d.description}</div>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
 
-                {/* PROGRAMME */}
-                {vis('programme') && (
-                  <div style={{ marginTop: 40, padding: 28, background: "var(--bg-card)", border: "1px solid var(--line)", borderRadius: "var(--r-md)" }}>
-                    <h3 id="programme" style={{ fontFamily: "var(--serif)", fontSize: "1.5rem", marginBottom: 10 }}>
-                      {prog.titre ?? 'Construisez votre propre programme'}
-                    </h3>
-                    <p style={{ margin: 0, color: "var(--ink-soft)" }}>
-                      {prog.texte_intro ?? "Vous pouvez assister à 2 ou 3 heures de cours par semaine. L'adhésion vous permet de choisir, parmi les 43 cours proposés, au maximum :"}
-                    </p>
-                    <ul style={{ margin: "12px 0 0 20px", color: "var(--ink-soft)" }}>
-                      {progItems.map((item, i) => <li key={i}>{item}</li>)}
-                    </ul>
-                    {(prog.note || !prog.titre) && (
-                      <p style={{ marginTop: 14, fontSize: "0.92rem", color: "var(--ink-mute)" }}>
-                        {prog.note ?? 'Chaque cours couvre la saison complète, soit environ 34 séances.'}
-                      </p>
-                    )}
-                    <div style={{ marginTop: 20, display: "flex", gap: 12 }}>
-                      <Link className="btn btn-primary" href={prog.cta1_lien ?? '/planning/gym'}>
-                        {prog.cta1_texte ?? 'Voir le planning'}
-                      </Link>
-                      <Link className="btn btn-ghost" href={prog.cta2_lien ?? '/inscriptions'}>
-                        {prog.cta2_texte ?? "S'inscrire"}
-                      </Link>
-                    </div>
-                  </div>
-                )}
-
-                {/* ANIMATEURS */}
+                {/* Animateurs — always shown if data exists, not a block */}
                 {animList.length > 0 && (
-                  <>
-                    <h3 id="animateurs" style={{ marginTop: 60, fontFamily: "var(--serif)", fontSize: "1.8rem", fontWeight: 500 }}>
+                  <div style={{ marginTop: 60 }}>
+                    <h3 id="animateurs" style={{ fontFamily: "var(--serif)", fontSize: "1.8rem", fontWeight: 500 }}>
                       Notre équipe d'animateurs
                     </h3>
                     <p className="muted">
@@ -184,21 +215,6 @@ export default async function GymPage() {
                         </div>
                       ))}
                     </div>
-                  </>
-                )}
-
-                {/* PRESCRI */}
-                {vis('prescri') && (
-                  <div style={{ marginTop: 48, padding: 32, background: "var(--green-tint)", borderRadius: "var(--r-md)" }}>
-                    <h3 id="prescri" style={{ marginBottom: 10 }}>
-                      {prescri.titre ?? "Prescri'Forme — sport sur ordonnance"}
-                    </h3>
-                    <p style={{ color: "var(--ink-soft)", marginBottom: 14 }}>
-                      {prescri.texte ?? "L'Association est agréée pour dispenser des cours de gym volontaire sur prescription médicale (dispositif Prescri'Forme, Île-de-France, depuis septembre 2019)."}
-                    </p>
-                    <Link className="btn btn-ghost btn-sm" href={prescri.cta_lien ?? '/activites/sante'}>
-                      {prescri.cta_texte ?? 'En savoir plus'}
-                    </Link>
                   </div>
                 )}
 

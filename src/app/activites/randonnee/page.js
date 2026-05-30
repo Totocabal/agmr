@@ -132,6 +132,13 @@ export default async function RandoPage() {
                         {jeudi.note ?? "Les groupes 2A et 2B pourront être réunis en fonction du nombre d'animateurs disponibles. Les départs se font en covoiturage."}
                       </p>
                     )}
+                    <Link
+                      className="btn btn-primary"
+                      style={{ marginTop: 20, display: "inline-flex" }}
+                      href="/planning/randonnee"
+                    >
+                      Voir le planning des sorties
+                    </Link>
                   </>
                 )}
 

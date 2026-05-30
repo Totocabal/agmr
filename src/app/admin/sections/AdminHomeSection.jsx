@@ -135,8 +135,8 @@ export default function AdminHomeSection() {
           return (
             <div key={block.block_key} style={{ background: "var(--bg-card)", border: "1px solid var(--line)", borderRadius: "var(--r-md)", padding: "14px 20px", display: "flex", alignItems: "center", gap: 14, opacity: block.visible ? 1 : 0.5 }}>
               <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                <button className="icon-btn" style={{ padding: 2 }} disabled={idx === 0} onClick={() => moveBlock(idx, -1)}><Icon name="chevronUp" size={12}/></button>
-                <button className="icon-btn" style={{ padding: 2 }} disabled={idx === blocks.length - 1} onClick={() => moveBlock(idx, 1)}><Icon name="chevronDown" size={12}/></button>
+                <button className="icon-btn" disabled={idx === 0} onClick={() => moveBlock(idx, -1)}><Icon name="chevronUp" size={16}/></button>
+                <button className="icon-btn" disabled={idx === blocks.length - 1} onClick={() => moveBlock(idx, 1)}><Icon name="chevronDown" size={16}/></button>
               </div>
               {hasPhoto && (
                 photoUrl ? (

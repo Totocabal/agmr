@@ -370,7 +370,7 @@ export default function AdminBackupSection() {
     <>
       <div className="admin-head">
         <div>
-          <h1>Sauvegarde</h1>
+          <h1>Sauvegarde <HelpTip text="Cette section vous permet de protéger les données du site. Il est conseillé de faire un export manuel avant toute modification importante." position="right" /></h1>
           <p className="muted" style={{ margin: 0 }}>Export, sauvegardes automatiques et restauration</p>
         </div>
       </div>

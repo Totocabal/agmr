@@ -102,7 +102,7 @@ export default function AdminSejoursSection() {
             Voir la page →
           </a>
           <button className="btn btn-primary" onClick={() => setEditing(blank)}>
-            <Icon name="plus" size={16}/> Nouveau séjour
+            <Icon name="plus" size={16}/> Nouveau séjour <HelpTip text="Crée une fiche pour un nouveau voyage ou séjour. Renseignez le titre, les dates (en texte libre, ex : '14–21 mai 2026'), le moyen de transport et une description. Vous pouvez aussi ajouter une photo ou choisir une couleur de carte." position="bottom" />
           </button>
         </div>
       </div>

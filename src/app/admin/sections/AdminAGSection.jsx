@@ -76,7 +76,7 @@ export default function AdminAGSection() {
     <>
       <div className="admin-head">
         <div>
-          <h1>Assemblée Générale</h1>
+          <h1>Assemblée Générale <HelpTip text="Cette section regroupe les documents officiels (procès-verbaux, comptes rendus) de chaque Assemblée Générale, classés par saison." position="right" /></h1>
           <p className="muted" style={{ margin: 0 }}>Documents par saison</p>
         </div>
         <div style={{ display: "flex", gap: 10 }}>

@@ -29,6 +29,7 @@ export default function AdminSantePageSection() {
   const [blocks, setBlocks]   = useState([])
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState(null)
+  const [showCatalogue, setShowCatalogue] = useState(false)
   const supabase = createClient()
 
   const load = async () => {
@@ -46,6 +47,27 @@ export default function AdminSantePageSection() {
     await supabase.from('sante_page_blocks').update({ content }).eq('block_key', key)
     setEditing(null); load()
   }
+  const moveBlock = async (idx, dir) => {
+    const target = blocks[idx + dir]
+    const current = blocks[idx]
+    if (!target) return
+    await supabase.from('sante_page_blocks').update({ ordre: target.ordre }).eq('id', current.id)
+    await supabase.from('sante_page_blocks').update({ ordre: current.ordre }).eq('id', target.id)
+    load()
+  }
+  const deleteBlock = async (block) => {
+    if (!confirm(`Supprimer le bloc "${BLOCK_META[block.block_key]?.label ?? block.block_key}" ?`)) return
+    await supabase.from('sante_page_blocks').delete().eq('id', block.id)
+    load()
+  }
+  const addBlock = async (key) => {
+    const maxOrdre = Math.max(0, ...blocks.map(b => b.ordre ?? 0))
+    await supabase.from('sante_page_blocks').insert({ block_key: key, label: BLOCK_META[key].label, visible: true, content: {}, ordre: maxOrdre + 10 })
+    setShowCatalogue(false)
+    load()
+  }
+  const existingKeys = new Set(blocks.map(b => b.block_key))
+  const catalogueItems = Object.entries(BLOCK_META).filter(([key]) => !existingKeys.has(key))
 
   if (loading) return <div style={{ padding: 40, color: "var(--ink-mute)" }}>Chargement...</div>
 
@@ -59,11 +81,20 @@ export default function AdminSantePageSection() {
         <a className="btn btn-ghost btn-sm" href="/activites/sante" target="_blank" rel="noopener noreferrer">Voir la page →</a>
       </div>
 
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 12 }}>
+        <button className="btn btn-ghost btn-sm" onClick={() => setShowCatalogue(true)}>
+          <Icon name="plus" size={13}/> Ajouter un bloc
+        </button>
+      </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        {blocks.map(block => {
+        {blocks.map((block, idx) => {
           const meta = BLOCK_META[block.block_key] ?? { label: block.block_key, desc: '' }
           return (
             <div key={block.block_key} style={{ background: "var(--bg-card)", border: "1px solid var(--line)", borderRadius: "var(--r-md)", padding: "14px 20px", display: "flex", alignItems: "center", gap: 14, opacity: block.visible ? 1 : 0.5 }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                <button className="icon-btn" style={{ padding: 2 }} disabled={idx === 0} onClick={() => moveBlock(idx, -1)}><Icon name="chevron-up" size={12}/></button>
+                <button className="icon-btn" style={{ padding: 2 }} disabled={idx === blocks.length - 1} onClick={() => moveBlock(idx, 1)}><Icon name="chevron-down" size={12}/></button>
+              </div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontWeight: 600, fontSize: "0.95rem" }}>{meta.label}</div>
                 <div className="muted" style={{ fontSize: "0.82rem", marginTop: 2 }}>{meta.desc}</div>
@@ -72,11 +103,29 @@ export default function AdminSantePageSection() {
                 <span style={{ fontSize: "0.78rem", color: "var(--ink-mute)" }}>{block.visible ? 'Visible' : 'Masqué'}</span>
                 <button className={`switch ${block.visible ? 'on' : ''}`} onClick={() => toggleVisible(block.block_key, block.visible)}/>
                 <button className="icon-btn" onClick={() => setEditing(block)}><Icon name="edit" size={14}/></button>
+                <button className="icon-btn" onClick={() => deleteBlock(block)} style={{ color: 'var(--red)' }}><Icon name="trash" size={14}/></button>
               </div>
             </div>
           )
         })}
       </div>
+
+      {showCatalogue && (
+        <Modal title="Ajouter un bloc" onClose={() => setShowCatalogue(false)}>
+          {catalogueItems.length === 0 ? (
+            <p style={{ color: "var(--ink-mute)" }}>Tous les blocs sont déjà présents sur la page.</p>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {catalogueItems.map(([key, meta]) => (
+                <button key={key} onClick={() => addBlock(key)} style={{ background: "var(--bg-card)", border: "1px solid var(--line)", borderRadius: "var(--r-md)", padding: "14px 18px", textAlign: "left", cursor: "pointer", display: "flex", flexDirection: "column", gap: 2 }}>
+                  <span style={{ fontWeight: 600 }}>{meta.label}</span>
+                  <span style={{ fontSize: "0.82rem", color: "var(--ink-mute)" }}>{meta.desc}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </Modal>
+      )}
 
       {editing && (
         <Modal title={`Modifier — ${BLOCK_META[editing.block_key]?.label ?? editing.block_key}`} onClose={() => setEditing(null)}>

@@ -88,7 +88,7 @@ export default function AdminComiteSection() {
     <>
       <div className="admin-head">
         <div>
-          <h1>Comité directeur</h1>
+          <h1>Comité directeur <HelpTip text="Gérez les membres du bureau de l'association et les animateurs de la section gym. Ces informations apparaissent sur la page publique du comité directeur." position="right" /></h1>
           <p className="muted" style={{ margin: 0 }}>Bureau et animateurs</p>
         </div>
         <a className="btn btn-ghost btn-sm" href="/association/comite-directeur" target="_blank" rel="noopener noreferrer">Voir la page →</a>

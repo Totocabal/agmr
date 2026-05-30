@@ -322,7 +322,7 @@ export default function AdminGalerieSection() {
     <>
       <div className="admin-head">
         <div>
-          <h1>Galerie</h1>
+          <h1>Galerie <HelpTip text="Gérez ici la galerie photos du site. Les photos sont organisées par albums (ex : Sorties 2024, Forum des associations). Cliquez sur un album pour l'ouvrir et y ajouter ou supprimer des photos." position="right" /></h1>
           <p className="muted" style={{ margin: 0 }}>
             {photos.length} photo{photos.length !== 1 ? 's' : ''} · {albumNames.length} album{albumNames.length !== 1 ? 's' : ''} —{' '}
             <strong style={{ color: 'var(--green)' }}>Cloudinary CDN</strong>

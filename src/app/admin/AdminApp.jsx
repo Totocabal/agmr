@@ -32,6 +32,13 @@ import AdminBannerSection from './sections/AdminBannerSection'
 function AdminSidebar({ section, setSection, user, canAccess, isSuperAdmin }) {
   const router = useRouter()
   const { helpMode, setHelpMode } = useHelp()
+  const [bannerActive, setBannerActive] = useState(false)
+  const supabase = createClient()
+
+  useEffect(() => {
+    supabase.from('site_banners').select('id').eq('active', true).limit(1)
+      .then(({ data }) => setBannerActive((data ?? []).length > 0))
+  }, [section]) // re-check quand on change de section
 
   const allItems = [
     { id: "dash",          label: "Tableau de bord",    icon: "home",          always: true },
@@ -104,6 +111,9 @@ function AdminSidebar({ section, setSection, user, canAccess, isSuperAdmin }) {
           return (
             <a key={it.id} href="#" className={section === it.id ? "active" : ""} onClick={e => { e.preventDefault(); setSection(it.id) }}>
               <Icon name={it.icon} size={16}/> {it.label}
+              {it.id === "banner" && bannerActive && (
+                <span style={{ marginLeft: "auto", width: 18, height: 18, borderRadius: "50%", background: "#e88a5a", color: "#fff", fontSize: "0.65rem", fontWeight: 800, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0, lineHeight: 1 }}>!</span>
+              )}
             </a>
           )
         })}

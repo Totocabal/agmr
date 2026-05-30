@@ -284,6 +284,24 @@ export default function AdminGymPageSection() {
         </>
       )}
 
+      {/* ── Catalogue modal ── */}
+      {showCatalogue && (
+        <Modal title="Ajouter un bloc" onClose={() => setShowCatalogue(false)}>
+          {catalogueItems.length === 0 ? (
+            <p style={{ color: "var(--ink-mute)" }}>Tous les blocs sont déjà présents sur la page.</p>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {catalogueItems.map(([key, meta]) => (
+                <button key={key} onClick={() => addBlock(key)} style={{ background: "var(--bg-card)", border: "1px solid var(--line)", borderRadius: "var(--r-md)", padding: "14px 18px", textAlign: "left", cursor: "pointer", display: "flex", flexDirection: "column", gap: 2 }}>
+                  <span style={{ fontWeight: 600 }}>{meta.label}</span>
+                  <span style={{ fontSize: "0.82rem", color: "var(--ink-mute)" }}>{meta.desc}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </Modal>
+      )}
+
       {/* ── Block edit modal ── */}
       {editing && (
         <Modal title={`Modifier — ${BLOCK_META[editing.block_key]?.label ?? editing.block_key}`} onClose={() => setEditing(null)}>

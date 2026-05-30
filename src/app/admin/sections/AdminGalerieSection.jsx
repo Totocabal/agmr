@@ -335,7 +335,7 @@ export default function AdminGalerieSection() {
         <h3 style={{ fontFamily: 'var(--sans)', fontSize: '1rem', fontWeight: 700, marginBottom: 16 }}>Ajouter des photos</h3>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 14 }}>
           <div className="field">
-            <label>Album existant</label>
+            <label>Album existant <HelpTip text="Sélectionnez l'album dans lequel vous souhaitez ajouter les photos. Si vous voulez créer un nouvel album, utilisez le champ à droite." position="right" /></label>
             <select value={selectedExisting} onChange={e => { setSelectedExisting(e.target.value); setNewAlbumName('') }}>
               {albumNames.map(a => <option key={a} value={a}>{a}</option>)}
               {albumNames.length === 0 && <option value="">Aucun album</option>}

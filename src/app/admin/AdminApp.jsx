@@ -86,10 +86,7 @@ function AdminSidebar({ section, setSection, user, canAccess, isSuperAdmin }) {
     <aside className="admin-side">
       <div className="admin-side-brand">
         <AGMRLogo size={52} light={true} withTagline={false}/>
-        <div className="asb-text">
-          <div className="asb-1">Admin</div>
-          <div className="asb-2">Back-office</div>
-        </div>
+        <div className="asb-2">Back-office</div>
       </div>
       <nav>
         {items.map((it, i) => {

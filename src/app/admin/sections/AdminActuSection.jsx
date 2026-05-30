@@ -120,13 +120,13 @@ export default function AdminActuSection() {
           <div className="form">
             <div className="row-2">
               <div className="field">
-                <label>Catégorie</label>
+                <label>Catégorie <HelpTip text="Choisissez le thème principal de l'article. Il sera affiché sous forme de badge coloré à côté du titre sur le site." position="right" /></label>
                 <select value={editing.cat} onChange={e => setEditing({ ...editing, cat: e.target.value })}>
                   {["gym","rando","nordique","asso","event"].map(c => <option key={c} value={c}>{catLabel(c)}</option>)}
                 </select>
               </div>
               <div className="field">
-                <label>Date</label>
+                <label>Date <HelpTip text="La date de publication de l'article. Les articles sont triés du plus récent au plus ancien sur le site." position="top" /></label>
                 <input type="date" value={editing.date} onChange={e => setEditing({ ...editing, date: e.target.value })}/>
               </div>
             </div>

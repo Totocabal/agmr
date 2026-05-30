@@ -53,7 +53,7 @@ export default function AdminSantePageSection() {
     <>
       <div className="admin-head">
         <div>
-          <h1>Page Santé par le sport</h1>
+          <h1>Page Santé par le sport <HelpTip text="Gérez le contenu de la page dédiée aux activités physiques adaptées : Prescri'Forme (sport sur ordonnance) et Rando-Santé (marche adaptée). Modifiez les textes ou masquez des blocs si nécessaire." position="right" /></h1>
           <p className="muted" style={{ margin: 0 }}>Prescri'Forme & Rando-Santé</p>
         </div>
         <a className="btn btn-ghost btn-sm" href="/activites/sante" target="_blank" rel="noopener noreferrer">Voir la page →</a>

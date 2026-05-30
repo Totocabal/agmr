@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import Icon from '@/components/ui/Icon'
 import { createClient } from '@/lib/supabase-client'
 import { logActivity } from '@/lib/activity'
+import HelpTip from '@/components/ui/HelpTip'
 
 // ── Filtre discipline multi-sélection ─────────────────────────
 function DisciplineFilter({ disciplines, counts, selected, onChange }) {

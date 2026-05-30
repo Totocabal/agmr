@@ -5,6 +5,7 @@ import ImageUpload from '@/components/ui/ImageUpload'
 import { createClient } from '@/lib/supabase-client'
 import { logActivity } from '@/lib/activity'
 import { formatDateFR, catLabel } from '@/utils/format'
+import HelpTip from '@/components/ui/HelpTip'
 
 function Modal({ title, onClose, children }) {
   return (

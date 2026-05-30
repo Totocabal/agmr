@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
 import Icon from '@/components/ui/Icon'
+import HelpTip from '@/components/ui/HelpTip'
 import { createClient } from '@/lib/supabase-client'
 
 const BACKUP_TABLES = [

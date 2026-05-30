@@ -170,7 +170,7 @@ export default function AdminBannerSection() {
                 </span>
 
                 {/* Actions */}
-                <button className="icon-btn" onClick={() => setEditing({ ...b })} title="Modifier">
+                <button className="icon-btn" onClick={() => setEditing({ ...b, expires_at: isoToLocal(b.expires_at) })} title="Modifier">
                   <Icon name="edit" size={14}/>
                 </button>
                 <button className="icon-btn" onClick={() => deleteBanner(b.id)} title="Supprimer" style={{ color: 'var(--red, #dc2626)' }}>

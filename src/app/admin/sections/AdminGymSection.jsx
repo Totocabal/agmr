@@ -279,7 +279,7 @@ export default function AdminGymSection() {
             <Icon name="download" size={14}/> Exporter PDF
           </button>
           <button className="btn btn-primary" onClick={() => setEditing(blank)}>
-            <Icon name="plus" size={16}/> Ajouter un créneau
+            <Icon name="plus" size={16}/> Ajouter un créneau <HelpTip text="Ouvre le formulaire pour créer un nouveau cours. Renseignez le jour, les horaires, la discipline, l'animateur et la salle. Le champ Récurrence définit si le cours a lieu chaque semaine, une semaine sur deux, etc." position="bottom" />
           </button>
         </div>
       </div>

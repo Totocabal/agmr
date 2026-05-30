@@ -24,6 +24,13 @@ export default async function TarifsPage() {
   // Note globale optionnelle
   const noteGlobale = rows.find(r => r.label === '__note_globale__')?.note ?? null
 
+  // Config page (saison, eyebrow, lede)
+  let pageConfig = {}
+  try { pageConfig = JSON.parse(rows.find(r => r.label === '__page_config__')?.note ?? '{}') } catch {}
+  const saison  = pageConfig.saison  ?? '2025-2026'
+  const eyebrow = pageConfig.eyebrow ?? 'Inscriptions · Saison ' + saison
+  const lede    = pageConfig.lede    ?? "L'inscription se compose de l'adhésion à l'association, de la licence fédérale et de la cotisation d'activité."
+
   return (
     <div className="page-shell">
       <Banner/>
@@ -32,9 +39,9 @@ export default async function TarifsPage() {
         <div className="page-header">
           <div className="container">
             <div className="crumb">Accueil / Inscriptions / Tarifs</div>
-            <div className="page-header-eyebrow">Inscriptions · Saison 2025-2026</div>
+            <div className="page-header-eyebrow">{eyebrow}</div>
             <h1>Tarifs</h1>
-            <p className="page-header-lede">L'inscription se compose de l'adhésion à l'association, de la licence fédérale et de la cotisation d'activité.</p>
+            <p className="page-header-lede">{lede}</p>
           </div>
         </div>
 
@@ -47,7 +54,7 @@ export default async function TarifsPage() {
                     <h3 style={{ color: "#fff", fontFamily: "var(--sans)", fontSize: "1.1rem", fontWeight: 700, margin: 0 }}>
                       {CAT_LABELS[cat] ?? cat}
                     </h3>
-                    <p style={{ margin: "4px 0 0", fontSize: "0.88rem", opacity: 0.8 }}>Saison 2025-2026</p>
+                    <p style={{ margin: "4px 0 0", fontSize: "0.88rem", opacity: 0.8 }}>Saison {saison}</p>
                   </div>
                   <table className="tbl" style={{ border: "none" }}>
                     <tbody>

@@ -126,6 +126,58 @@ function AddRow({ categorie, maxOrdre, onAdd }) {
   )
 }
 
+// ── Paramètres de page ────────────────────────────────────────
+function PageParams({ supabase }) {
+  const [cfg, setCfg]     = useState({ saison: '', eyebrow: '', lede: '' })
+  const [saved, setSaved] = useState(false)
+
+  useEffect(() => {
+    supabase.from('tarifs').select('note').eq('label', '__page_config__').maybeSingle()
+      .then(({ data }) => {
+        try { if (data?.note) setCfg(JSON.parse(data.note)) } catch {}
+      })
+  }, [])
+
+  const u = (k, v) => setCfg(c => ({ ...c, [k]: v }))
+
+  const save = async () => {
+    const note = JSON.stringify(cfg)
+    const { data } = await supabase.from('tarifs').select('id').eq('label', '__page_config__').maybeSingle()
+    if (data?.id) {
+      await supabase.from('tarifs').update({ note }).eq('id', data.id)
+    } else {
+      await supabase.from('tarifs').insert({ categorie: '__meta__', label: '__page_config__', valeur: '', note, ordre: 0 })
+    }
+    setSaved(true); setTimeout(() => setSaved(false), 1500)
+  }
+
+  return (
+    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--line)', borderRadius: 'var(--r-md)', padding: 24, marginBottom: 28 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
+        <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>Paramètres de la page</div>
+        {saved && <span style={{ color: 'var(--green)', fontSize: '0.85rem' }}>✓ Enregistré</span>}
+      </div>
+      <div className="form" style={{ gap: 14 }}>
+        <div className="row-2">
+          <div className="field">
+            <label>Saison <HelpTip text="S'affiche dans l'en-tête et dans les cartes de tarifs. Exemple : 2026-2027" position="right"/></label>
+            <input value={cfg.saison} onChange={e => u('saison', e.target.value)} onBlur={save} placeholder="2025-2026"/>
+          </div>
+          <div className="field">
+            <label>Accroche (eyebrow) <HelpTip text="Petite ligne au-dessus du titre H1. Laissez vide pour la valeur automatique." position="top"/></label>
+            <input value={cfg.eyebrow} onChange={e => u('eyebrow', e.target.value)} onBlur={save} placeholder={`Inscriptions · Saison ${cfg.saison || '2025-2026'}`}/>
+          </div>
+        </div>
+        <div className="field">
+          <label>Introduction (sous le titre) <HelpTip text="Phrase affichée en intro de la page tarifs, sous le titre." position="right"/></label>
+          <textarea rows={2} value={cfg.lede} onChange={e => u('lede', e.target.value)} onBlur={save}
+            placeholder="L'inscription se compose de l'adhésion à l'association, de la licence fédérale et de la cotisation d'activité."/>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ── Section principale ────────────────────────────────────────
 export default function AdminTarifsSection() {
   const [items, setItems]     = useState([])
@@ -172,7 +224,7 @@ export default function AdminTarifsSection() {
         <div>
           <h1>Tarifs <HelpTip text="Gérez les tarifs d'adhésion affichés sur le site. Cliquez directement dans un champ pour modifier la valeur, puis appuyez sur Entrée ou cliquez ailleurs pour enregistrer. Un ✓ vert confirme la sauvegarde." position="right" /></h1>
           <p className="muted" style={{ margin: 0 }}>
-            Saison 2025-2026 — enregistrement automatique ·{' '}
+            Enregistrement automatique ·{' '}
             <strong style={{ color: 'var(--green)' }}>données Supabase</strong>
           </p>
         </div>
@@ -180,6 +232,8 @@ export default function AdminTarifsSection() {
           Voir la page →
         </a>
       </div>
+
+      <PageParams supabase={supabase}/>
 
       <div style={{ background: 'var(--accent-tint)', border: '1px solid var(--accent-soft)', borderRadius: 'var(--r-sm)', padding: '10px 16px', marginBottom: 24, fontSize: '0.88rem', color: 'var(--ink-soft)', display: 'flex', gap: 8 }}>
         <Icon name="info" size={15}/>

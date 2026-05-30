@@ -112,7 +112,7 @@ export default function AdminRandoSection() {
     <>
       <div className="admin-head">
         <div>
-          <h1>Planning Randonnée & Nordique</h1>
+          <h1>Planning Randonnée & Nordique <HelpTip text="Gérez ici toutes les sorties à venir (randonnées du jeudi, du dimanche, marche nordique, nocturnes…). Chaque sortie peut être marquée complète, annulée ou rétablie depuis la liste." position="right" /></h1>
           <p className="muted" style={{ margin: 0 }}>{items.length} sorties — <strong style={{ color: "var(--green)" }}>données Supabase</strong></p>
         </div>
         <button className="btn btn-primary" onClick={() => setEditing(blank)}>

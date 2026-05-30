@@ -79,7 +79,7 @@ export default function AdminHomeSection() {
     <>
       <div className="admin-head">
         <div>
-          <h1>Page principale</h1>
+          <h1>Page principale <HelpTip text="Gérez le contenu de la page d'accueil du site : la bannière principale (hero), les cartes des activités, la section Philosophie, les actualités et le bandeau d'appel à l'action. Chaque bloc peut être rendu visible ou invisible indépendamment." position="right" /></h1>
           <p className="muted" style={{ margin: 0 }}>Contenu, photos, visibilité et chiffres clés</p>
         </div>
       </div>

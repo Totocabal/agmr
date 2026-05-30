@@ -115,6 +115,25 @@ function AdminSidebar({ section, setSection, user, canAccess, isSuperAdmin }) {
           <strong style={{ color: "#fff" }}>{user?.email}</strong>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {/* Toggle aide */}
+          <button
+            onClick={() => setHelpMode(!helpMode)}
+            title={helpMode ? "Désactiver les bulles d'aide" : "Activer les bulles d'aide"}
+            style={{
+              background: helpMode ? "rgba(184,69,31,0.22)" : "rgba(255,255,255,0.05)",
+              border: `1px solid ${helpMode ? "rgba(184,69,31,0.4)" : "#2a3a2d"}`,
+              borderRadius: 6,
+              color: helpMode ? "#e88a5a" : "#8b9089",
+              cursor: "pointer",
+              display: "flex", alignItems: "center", gap: 8,
+              padding: "7px 12px",
+              fontFamily: "inherit", fontSize: "0.82rem",
+              width: "100%", transition: "all 0.2s",
+            }}
+          >
+            <span style={{ width: 16, height: 16, borderRadius: "50%", background: helpMode ? "#e88a5a" : "#8b9089", color: "#fff", fontSize: "0.65rem", fontWeight: 700, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>?</span>
+            Bulles d'aide {helpMode ? "ON" : "OFF"}
+          </button>
           <a href="/" style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <Icon name="home" size={14}/> Retour au site
           </a>

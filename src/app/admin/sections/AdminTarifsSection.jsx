@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import Icon from '@/components/ui/Icon'
 import { createClient } from '@/lib/supabase-client'
 import { logActivity } from '@/lib/activity'
+import HelpTip from '@/components/ui/HelpTip'
 
 const CAT_LABELS   = { gym: 'Gym', marche: 'Marche & Nordique' }
 const CAT_OPTIONS  = [

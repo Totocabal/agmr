@@ -173,7 +173,7 @@ export default function AdminGymPageSection() {
         <>
           <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}>
             <button className="btn btn-primary" onClick={() => setEditingDisc({ mark: '', nom: '', description: '' })}>
-              <Icon name="plus" size={14}/> Ajouter une discipline
+              <Icon name="plus" size={14}/> Ajouter une discipline <HelpTip text="Ajoute une nouvelle discipline à la liste (ex : Pilates, Yoga, Stretching). La lettre / marque est une abréviation affichée dans le planning pour identifier rapidement la discipline." position="bottom" />
             </button>
           </div>
           <table className="tbl">

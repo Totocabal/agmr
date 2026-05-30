@@ -73,7 +73,7 @@ export default function AdminActuSection() {
     <>
       <div className="admin-head">
         <div>
-          <h1>Actualités</h1>
+          <h1>Actualités <HelpTip text="Gérez ici les articles qui apparaissent dans la section Actualités du site. Vous pouvez créer, modifier ou supprimer des articles. Chaque article est visible immédiatement sur le site après enregistrement." position="right" /></h1>
           <p className="muted" style={{ margin: 0 }}>{items.length} articles — <strong style={{ color: "var(--green)" }}>données Supabase</strong></p>
         </div>
         <button className="btn btn-primary" onClick={() => setEditing(blank)}>

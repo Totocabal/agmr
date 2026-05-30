@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import Icon from '@/components/ui/Icon'
 import { createClient } from '@/lib/supabase-client'
 import PdfUpload from '@/components/ui/PdfUpload'
+import HelpTip from '@/components/ui/HelpTip'
 
 function Modal({ title, onClose, children }) {
   return (

@@ -244,6 +244,27 @@ export default function AdminBannerSection() {
                   </div>
                 </div>
 
+                <div className="field">
+                  <label>
+                    Arrêt automatique <HelpTip text="Le bandeau se désactivera automatiquement à la date et l'heure choisies. Laissez vide pour qu'il reste actif indéfiniment jusqu'à ce que vous l'éteigniez manuellement." position="top" />
+                  </label>
+                  <input
+                    type="datetime-local"
+                    value={isoToLocal(editing.expires_at)}
+                    onChange={e => setEditing(ed => ({ ...ed, expires_at: e.target.value }))}
+                    min={new Date().toISOString().slice(0, 16)}
+                  />
+                  {editing.expires_at && (
+                    <button
+                      type="button"
+                      onClick={() => setEditing(ed => ({ ...ed, expires_at: '' }))}
+                      style={{ marginTop: 4, fontSize: '0.78rem', color: 'var(--ink-mute)', background: 'none', border: 'none', cursor: 'pointer', padding: 0, textDecoration: 'underline' }}
+                    >
+                      Supprimer la date d'arrêt
+                    </button>
+                  )}
+                </div>
+
                 {/* Aperçu live */}
                 {editing.message.trim() && (
                   <div style={{ borderRadius: 'var(--r-sm)', overflow: 'hidden', border: '1px solid var(--line)' }}>

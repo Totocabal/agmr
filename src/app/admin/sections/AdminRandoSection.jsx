@@ -115,9 +115,14 @@ export default function AdminRandoSection() {
           <h1>Planning Randonnée & Nordique <HelpTip text="Gérez ici toutes les sorties à venir (randonnées du jeudi, du dimanche, marche nordique, nocturnes…). Chaque sortie peut être marquée complète, annulée ou rétablie depuis la liste." position="right" /></h1>
           <p className="muted" style={{ margin: 0 }}>{items.length} sorties — <strong style={{ color: "var(--green)" }}>données Supabase</strong></p>
         </div>
-        <button className="btn btn-primary" onClick={() => setEditing(blank)}>
-          <Icon name="plus" size={16}/> Programmer une sortie <HelpTip text="Ajoute une nouvelle sortie au planning. Renseignez la date, le type (rando jeudi, dimanche, nordique…), le titre, la distance, le point de départ et l'heure. Les groupes permettent d'indiquer quels niveaux participent." position="bottom" />
-        </button>
+        <div style={{ display: "flex", gap: 8 }}>
+          <a className="btn btn-ghost btn-sm" href="/planning/randonnee" target="_blank" rel="noopener noreferrer">
+            Voir le planning →
+          </a>
+          <button className="btn btn-primary" onClick={() => setEditing(blank)}>
+            <Icon name="plus" size={16}/> Programmer une sortie <HelpTip text="Ajoute une nouvelle sortie au planning. Renseignez la date, le type (rando jeudi, dimanche, nordique…), le titre, la distance, le point de départ et l'heure. Les groupes permettent d'indiquer quels niveaux participent." position="bottom" />
+          </button>
+        </div>
       </div>
 
       <table className="tbl">

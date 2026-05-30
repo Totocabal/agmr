@@ -21,17 +21,9 @@ export default async function RandoPage() {
   ])
 
   const bm  = Object.fromEntries(blocks.map(b => [b.block_key, b]))
-  const c   = (key) => bm[key]?.content ?? {}
   const vis = (key) => bm[key]?.visible !== false
 
-  const header  = c('header')
-  const intro   = c('intro')
-  const jeudi   = c('jeudi')
-  const dim     = c('dimanche')
-  const sejours = c('sejours')
-  const temo    = c('temoignage')
-  const sante   = c('sante')
-
+  const sortedBlocks = blocks
   const groupeList = groupes.length > 0 ? groupes : DEFAULT_GROUPES
 
   return (
@@ -40,26 +32,30 @@ export default async function RandoPage() {
       <main className="page-main">
 
         {/* PAGE HEADER */}
-        {vis('header') && (
-          <div className="page-header">
-            <div className="container">
-              <div className="crumb">
-                <Link href="/">Accueil</Link>
-                <span>/</span>
-                <span>Activités</span>
-                <span>/</span>
-                <span>Randonnée</span>
+        {sortedBlocks.map(block => {
+          if (!block.visible || block.block_key !== 'header') return null
+          const content = block.content ?? {}
+          return (
+            <div key="header" className="page-header">
+              <div className="container">
+                <div className="crumb">
+                  <Link href="/">Accueil</Link>
+                  <span>/</span>
+                  <span>Activités</span>
+                  <span>/</span>
+                  <span>Randonnée</span>
+                </div>
+                <div className="page-header-eyebrow">
+                  {content.eyebrow ?? 'Activités · Fédération Française de Randonnée'}
+                </div>
+                <h1>{content.titre ?? 'La Randonnée'}</h1>
+                <p className="page-header-lede">
+                  {content.lede ?? 'Forêt de Rambouillet et alentours. 5 groupes de niveau, sorties chaque jeudi et un dimanche sur deux, séjours en France.'}
+                </p>
               </div>
-              <div className="page-header-eyebrow">
-                {header.eyebrow ?? 'Activités · Fédération Française de Randonnée'}
-              </div>
-              <h1>{header.titre ?? 'La Randonnée'}</h1>
-              <p className="page-header-lede">
-                {header.lede ?? 'Forêt de Rambouillet et alentours. 5 groupes de niveau, sorties chaque jeudi et un dimanche sur deux, séjours en France.'}
-              </p>
             </div>
-          </div>
-        )}
+          )
+        })}
 
         <section className="section">
           <div className="container">
@@ -79,138 +75,149 @@ export default async function RandoPage() {
                 </ul>
               </aside>
 
-              {/* MAIN CONTENT */}
+              {/* MAIN CONTENT — iterated in ordre */}
               <div>
+                {sortedBlocks.map(block => {
+                  if (!block.visible) return null
+                  const content = block.content ?? {}
 
-                {/* INTRO */}
-                {vis('intro') && (
-                  <>
-                    <h2 id="intro" style={{ fontSize: "2.2rem", marginBottom: 18 }}>
-                      {intro.titre ?? 'Marcher dans la forêt de Rambouillet'}
-                    </h2>
-                    <p style={{ fontSize: "1.12rem", color: "var(--ink-soft)" }}>
-                      {intro.texte ?? "Les randonnées se font en forêt de Rambouillet ou à proximité immédiate. Les adhérents se répartissent en 4 ou 5 groupes selon leurs possibilités ou affinités. Il est toujours possible de changer de groupe d'une fois sur l'autre."}
-                    </p>
-                    {(intro.alerte || !intro.titre) && (
-                      <div style={{ background: "var(--accent-tint)", border: "1px solid var(--accent-soft)", borderRadius: "var(--r-md)", padding: 20, margin: "20px 0", fontSize: "0.96rem" }}>
-                        <strong>Important :</strong>{' '}
-                        {intro.alerte ?? "tout randonneur devrait avoir dans son sac la fiche individuelle de santé. Elle contribue à renforcer la sécurité lors des sorties."}{' '}
-                        {(intro.alerte_lien || !intro.titre) && (
-                          <a href={intro.alerte_lien ?? '#'} style={{ fontWeight: 600 }}>
-                            {intro.alerte_lien_texte ?? 'Télécharger la fiche'}
-                          </a>
-                        )}
-                      </div>
-                    )}
-                  </>
-                )}
+                  switch (block.block_key) {
+                    case 'header':
+                      return null // rendered above
 
-                {/* JEUDI */}
-                {vis('jeudi') && (
-                  <>
-                    <h3 id="jeudi" style={{ marginTop: 40, fontFamily: "var(--serif)", fontSize: "1.8rem" }}>
-                      {jeudi.titre ?? 'Les randonnées du jeudi'}
-                    </h3>
-                    <p>{jeudi.intro ?? '5 groupes de niveau, chaque jeudi après-midi.'}</p>
-                    <table className="tbl" style={{ marginTop: 16 }}>
-                      <thead>
-                        <tr><th>Groupe</th><th>Distance</th><th>Retour vers</th><th>Point de RDV</th></tr>
-                      </thead>
-                      <tbody>
-                        {groupeList.map(g => (
-                          <tr key={g.id}>
-                            <td><strong>{g.groupe}</strong></td>
-                            <td>{g.distance}</td>
-                            <td>{g.retour}</td>
-                            <td>{g.rdv}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                    {(jeudi.note || !jeudi.titre) && (
-                      <p style={{ marginTop: 12, fontSize: "0.92rem", color: "var(--ink-mute)" }}>
-                        {jeudi.note ?? "Les groupes 2A et 2B pourront être réunis en fonction du nombre d'animateurs disponibles. Les départs se font en covoiturage."}
-                      </p>
-                    )}
-                    <Link
-                      className="btn btn-primary"
-                      style={{ marginTop: 20, display: "inline-flex" }}
-                      href="/planning/randonnee"
-                    >
-                      Voir le planning des sorties
-                    </Link>
-                  </>
-                )}
-
-                {/* DIMANCHE */}
-                {vis('dimanche') && (
-                  <>
-                    <h3 id="dimanche" style={{ marginTop: 40, fontFamily: "var(--serif)", fontSize: "1.8rem" }}>
-                      {dim.titre ?? 'Les randonnées du dimanche'}
-                    </h3>
-                    <p>
-                      {dim.texte1 ?? 'Environ tous les 15 jours. Parcours de 9 à 11 km. Rassemblement à 8h45 sur le parking du centre Leclerc, départ à 9h, retour vers midi.'}
-                    </p>
-                    <p style={{ color: "var(--ink-soft)", fontSize: "0.96rem" }}>
-                      {dim.texte2 ?? "Conditions : être inscrit à la section marche de l'AGMR. Une sortie d'essai est possible sans inscription."}
-                    </p>
-                  </>
-                )}
-
-                {/* SEJOURS */}
-                {vis('sejours') && (
-                  <>
-                    <h3 id="sejours" style={{ marginTop: 40, fontFamily: "var(--serif)", fontSize: "1.8rem" }}>
-                      {sejours.titre ?? 'Sorties à la journée et séjours'}
-                    </h3>
-                    <p>
-                      {sejours.texte ?? 'Sorties à thèmes plusieurs fois par trimestre, en train, en car ou en covoiturage. 1 séjour en car chaque saison + plusieurs séjours en covoiturage.'}
-                    </p>
-                    <Link
-                      className="btn btn-green"
-                      style={{ marginTop: 12, display: "inline-flex" }}
-                      href={sejours.cta_lien ?? '/actualites/sejours'}
-                    >
-                      {sejours.cta_texte ?? 'Voir les séjours'}
-                    </Link>
-                  </>
-                )}
-
-                {/* TEMOIGNAGE */}
-                {vis('temoignage') && (
-                  <div className="quote" style={{ padding: "48px 0 24px", marginTop: 32 }}>
-                    <div className="quote-body" style={{ padding: 0 }}>
-                      <div className="quote-text" style={{ fontSize: "1.7rem" }}>
-                        « {temo.citation ?? "On marche en silence dans la forêt, puis on rit fort autour d'un verre. C'est ça, l'esprit AGMR."} »
-                      </div>
-                      <div className="quote-attr">
-                        <div className="quote-avatar">
-                          {(temo.auteur ?? 'Jean-Pierre, animateur rando').charAt(0).toUpperCase()}
+                    case 'intro':
+                      return (
+                        <div key="intro">
+                          <h2 id="intro" style={{ fontSize: "2.2rem", marginBottom: 18 }}>
+                            {content.titre ?? 'Marcher dans la forêt de Rambouillet'}
+                          </h2>
+                          <p style={{ fontSize: "1.12rem", color: "var(--ink-soft)" }}>
+                            {content.texte ?? "Les randonnées se font en forêt de Rambouillet ou à proximité immédiate. Les adhérents se répartissent en 4 ou 5 groupes selon leurs possibilités ou affinités. Il est toujours possible de changer de groupe d'une fois sur l'autre."}
+                          </p>
+                          {(content.alerte || !content.titre) && (
+                            <div style={{ background: "var(--accent-tint)", border: "1px solid var(--accent-soft)", borderRadius: "var(--r-md)", padding: 20, margin: "20px 0", fontSize: "0.96rem" }}>
+                              <strong>Important :</strong>{' '}
+                              {content.alerte ?? "tout randonneur devrait avoir dans son sac la fiche individuelle de santé. Elle contribue à renforcer la sécurité lors des sorties."}{' '}
+                              {(content.alerte_lien || !content.titre) && (
+                                <a href={content.alerte_lien ?? '#'} style={{ fontWeight: 600 }}>
+                                  {content.alerte_lien_texte ?? 'Télécharger la fiche'}
+                                </a>
+                              )}
+                            </div>
+                          )}
                         </div>
-                        <div className="quote-attr-text">
-                          <span className="quote-attr-name">{temo.auteur ?? 'Jean-Pierre, animateur rando'}</span>
-                          <span className="quote-attr-role">{temo.role ?? 'Bénévole depuis 2014'}</span>
+                      )
+
+                    case 'jeudi':
+                      return (
+                        <div key="jeudi">
+                          <h3 id="jeudi" style={{ marginTop: 40, fontFamily: "var(--serif)", fontSize: "1.8rem" }}>
+                            {content.titre ?? 'Les randonnées du jeudi'}
+                          </h3>
+                          <p>{content.intro ?? '5 groupes de niveau, chaque jeudi après-midi.'}</p>
+                          <table className="tbl" style={{ marginTop: 16 }}>
+                            <thead>
+                              <tr><th>Groupe</th><th>Distance</th><th>Retour vers</th><th>Point de RDV</th></tr>
+                            </thead>
+                            <tbody>
+                              {groupeList.map(g => (
+                                <tr key={g.id}>
+                                  <td><strong>{g.groupe}</strong></td>
+                                  <td>{g.distance}</td>
+                                  <td>{g.retour}</td>
+                                  <td>{g.rdv}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                          {(content.note || !content.titre) && (
+                            <p style={{ marginTop: 12, fontSize: "0.92rem", color: "var(--ink-mute)" }}>
+                              {content.note ?? "Les groupes 2A et 2B pourront être réunis en fonction du nombre d'animateurs disponibles. Les départs se font en covoiturage."}
+                            </p>
+                          )}
+                          <Link
+                            className="btn btn-primary"
+                            style={{ marginTop: 20, display: "inline-flex" }}
+                            href="/planning/randonnee"
+                          >
+                            Voir le planning des sorties
+                          </Link>
                         </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
+                      )
 
-                {/* SANTE */}
-                {vis('sante') && (
-                  <div style={{ marginTop: 32, padding: 32, background: "var(--green-tint)", borderRadius: "var(--r-md)" }}>
-                    <h3 id="sante" style={{ marginBottom: 10 }}>
-                      {sante.titre ?? 'Rando-Santé'}
-                    </h3>
-                    <p style={{ color: "var(--ink-soft)", marginBottom: 14 }}>
-                      {sante.texte ?? "Plus lentement, moins longtemps et moins loin. Activité destinée aux personnes atteintes de diverses pathologies. L'AGMR a obtenu le label « Santé » de la FFR."}
-                    </p>
-                    <Link className="btn btn-green btn-sm" href={sante.cta_lien ?? '/activites/sante'}>
-                      {sante.cta_texte ?? 'En savoir plus'}
-                    </Link>
-                  </div>
-                )}
+                    case 'dimanche':
+                      return (
+                        <div key="dimanche">
+                          <h3 id="dimanche" style={{ marginTop: 40, fontFamily: "var(--serif)", fontSize: "1.8rem" }}>
+                            {content.titre ?? 'Les randonnées du dimanche'}
+                          </h3>
+                          <p>
+                            {content.texte1 ?? 'Environ tous les 15 jours. Parcours de 9 à 11 km. Rassemblement à 8h45 sur le parking du centre Leclerc, départ à 9h, retour vers midi.'}
+                          </p>
+                          <p style={{ color: "var(--ink-soft)", fontSize: "0.96rem" }}>
+                            {content.texte2 ?? "Conditions : être inscrit à la section marche de l'AGMR. Une sortie d'essai est possible sans inscription."}
+                          </p>
+                        </div>
+                      )
 
+                    case 'sejours':
+                      return (
+                        <div key="sejours">
+                          <h3 id="sejours" style={{ marginTop: 40, fontFamily: "var(--serif)", fontSize: "1.8rem" }}>
+                            {content.titre ?? 'Sorties à la journée et séjours'}
+                          </h3>
+                          <p>
+                            {content.texte ?? 'Sorties à thèmes plusieurs fois par trimestre, en train, en car ou en covoiturage. 1 séjour en car chaque saison + plusieurs séjours en covoiturage.'}
+                          </p>
+                          <Link
+                            className="btn btn-green"
+                            style={{ marginTop: 12, display: "inline-flex" }}
+                            href={content.cta_lien ?? '/actualites/sejours'}
+                          >
+                            {content.cta_texte ?? 'Voir les séjours'}
+                          </Link>
+                        </div>
+                      )
+
+                    case 'temoignage':
+                      return (
+                        <div key="temoignage" className="quote" style={{ padding: "48px 0 24px", marginTop: 32 }}>
+                          <div className="quote-body" style={{ padding: 0 }}>
+                            <div className="quote-text" style={{ fontSize: "1.7rem" }}>
+                              « {content.citation ?? "On marche en silence dans la forêt, puis on rit fort autour d'un verre. C'est ça, l'esprit AGMR."} »
+                            </div>
+                            <div className="quote-attr">
+                              <div className="quote-avatar">
+                                {(content.auteur ?? 'Jean-Pierre, animateur rando').charAt(0).toUpperCase()}
+                              </div>
+                              <div className="quote-attr-text">
+                                <span className="quote-attr-name">{content.auteur ?? 'Jean-Pierre, animateur rando'}</span>
+                                <span className="quote-attr-role">{content.role ?? 'Bénévole depuis 2014'}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )
+
+                    case 'sante':
+                      return (
+                        <div key="sante" style={{ marginTop: 32, padding: 32, background: "var(--green-tint)", borderRadius: "var(--r-md)" }}>
+                          <h3 id="sante" style={{ marginBottom: 10 }}>
+                            {content.titre ?? 'Rando-Santé'}
+                          </h3>
+                          <p style={{ color: "var(--ink-soft)", marginBottom: 14 }}>
+                            {content.texte ?? "Plus lentement, moins longtemps et moins loin. Activité destinée aux personnes atteintes de diverses pathologies. L'AGMR a obtenu le label « Santé » de la FFR."}
+                          </p>
+                          <Link className="btn btn-green btn-sm" href={content.cta_lien ?? '/activites/sante'}>
+                            {content.cta_texte ?? 'En savoir plus'}
+                          </Link>
+                        </div>
+                      )
+
+                    default:
+                      return null
+                  }
+                })}
               </div>
             </div>
           </div>

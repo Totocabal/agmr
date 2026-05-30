@@ -263,7 +263,7 @@ function RestoreCard({ storagePath, onClear }) {
           <Icon name="refresh" size={18}/>
         </div>
         <div>
-          <div style={{ fontWeight: 700 }}>Restauration</div>
+          <div style={{ fontWeight: 700 }}>Restauration <HelpTip text="Restaurer permet de remettre le site dans l'état d'une sauvegarde précédente. Utile si des données ont été supprimées par erreur. Attention : cela remplace les données actuelles." position="bottom" /></div>
           <div style={{ fontSize: '0.82rem', color: 'var(--ink-mute)' }}>Depuis un fichier ou une sauvegarde automatique</div>
         </div>
         {hasSource && (

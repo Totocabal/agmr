@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import Icon from '@/components/ui/Icon'
 import { createClient } from '@/lib/supabase-client'
 import PhotoUpload from '@/components/admin/PhotoUpload'
+import HelpTip from '@/components/ui/HelpTip'
 
 const BLOCK_META = {
   header:    { label: 'En-tête de page',          desc: 'Accroche, titre principal, chapeau' },

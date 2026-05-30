@@ -121,7 +121,7 @@ export default function AdminGymPageSection() {
     <>
       <div className="admin-head">
         <div>
-          <h1>Page Gym</h1>
+          <h1>Page Gym <HelpTip text="Gérez le contenu de la page publique de la section Gym : les textes des blocs de présentation, la liste des disciplines proposées et l'équipe d'animateurs." position="right" /></h1>
           <p className="muted" style={{ margin: 0 }}>Contenu, disciplines et équipe d'animateurs</p>
         </div>
         <a className="btn btn-ghost btn-sm" href="/activites/gym" target="_blank" rel="noopener noreferrer">

@@ -209,7 +209,7 @@ export default function AdminGymPageSection() {
         <>
           <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}>
             <button className="btn btn-primary" onClick={() => setEditingAnim({ nom: '', role: '', disciplines: '', photo_url: '' })}>
-              <Icon name="plus" size={14}/> Ajouter un animateur
+              <Icon name="plus" size={14}/> Ajouter un animateur <HelpTip text="Ajoute un membre de l'équipe d'encadrement gym. Renseignez son nom, son titre et les cours qu'il anime. L'interrupteur Visible/Masqué permet de le retirer temporairement de la page publique." position="bottom" />
             </button>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>

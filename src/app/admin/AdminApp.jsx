@@ -643,6 +643,7 @@ export default function AdminApp({ user, profile }) {
           {section === "guide"         && <AdminGuideSection/>}
           {section === "settings"      && <AdminSettings user={user}/>}
           {section === "access"        && isSuperAdmin               && <AdminAccessSection/>}
+          {section === "backup"        && isSuperAdmin               && <AdminBackupSection/>}
         </div>
       </div>
     </>

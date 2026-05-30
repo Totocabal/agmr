@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
+import { useHelp } from '@/lib/help-context'
 import { useRouter } from 'next/navigation'
 import AGMRLogo from '@/components/ui/AGMRLogo'
 import Icon from '@/components/ui/Icon'

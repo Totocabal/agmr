@@ -76,6 +76,7 @@ export default function AdminBannerSection() {
       lien:       editing.lien?.trim() || null,
       lien_texte: editing.lien_texte?.trim() || null,
       active:     editing.active ?? false,
+      expires_at: localToISO(editing.expires_at) || null,
     }
     if (editing.id) {
       const { error } = await supabase.from('site_banners').update(payload).eq('id', editing.id)

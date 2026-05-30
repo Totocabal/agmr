@@ -153,6 +153,15 @@ export default function AdminBannerSection() {
                       Lien : {b.lien_texte ? `${b.lien_texte} → ` : ''}{b.lien}
                     </div>
                   )}
+                  {b.expires_at && (() => {
+                    const exp = formatExpiry(b.expires_at)
+                    return (
+                      <div style={{ fontSize: '0.78rem', color: exp.expired ? 'var(--red, #dc2626)' : 'var(--ink-mute)', marginTop: 2, display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <Icon name="clock" size={11}/>
+                        {exp.expired ? 'Expiré' : `Arrêt programmé : ${exp.label}`}
+                      </div>
+                    )
+                  })()}
                 </div>
 
                 {/* Statut */}

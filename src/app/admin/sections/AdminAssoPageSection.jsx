@@ -68,7 +68,7 @@ export default function AdminAssoPageSection() {
     <>
       <div className="admin-head">
         <div>
-          <h1>Page Présentation</h1>
+          <h1>Page Présentation <HelpTip text="Gérez ici le contenu de la page de présentation de l'association. Chaque ligne correspond à un bloc de la page : vous pouvez le rendre visible ou invisible, et modifier son texte." position="right" /></h1>
           <p className="muted" style={{ margin: 0 }}>L'association — contenu éditorial</p>
         </div>
         <a className="btn btn-ghost btn-sm" href="/association" target="_blank" rel="noopener noreferrer">Voir la page →</a>

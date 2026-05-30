@@ -81,7 +81,7 @@ export default function AdminAGSection() {
         </div>
         <div style={{ display: "flex", gap: 10 }}>
           <button className="btn btn-ghost btn-sm" onClick={() => setShowAddSaison(true)}>
-            <Icon name="plus" size={14}/> Nouvelle saison
+            <Icon name="plus" size={14}/> Nouvelle saison <HelpTip text="Crée un nouveau groupe de documents pour une saison sportive. Exemple : '2025-2026'. Une fois la saison créée, vous pourrez y ajouter des documents PDF." position="bottom" />
           </button>
           <a className="btn btn-ghost btn-sm" href="/association/assemblee-generale" target="_blank" rel="noopener noreferrer">Voir la page →</a>
         </div>

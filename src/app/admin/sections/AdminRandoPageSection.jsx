@@ -146,7 +146,7 @@ export default function AdminRandoPageSection() {
           </div>
           <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}>
             <button className="btn btn-primary" onClick={() => setEditingGroupe({ groupe: '', distance: '', retour: '', rdv: '' })}>
-              <Icon name="plus" size={14}/> Ajouter un groupe
+              <Icon name="plus" size={14}/> Ajouter un groupe <HelpTip text="Ajoute un groupe de randonnée du jeudi. Renseignez le nom du groupe (ex : Groupe 1), la distance habituelle, l'heure de retour et le point de rendez-vous. Ces infos s'affichent dans le tableau sur la page Randonnée." position="bottom" />
             </button>
           </div>
           <table className="tbl">

@@ -100,8 +100,8 @@ export default function AdminNordiquePageSection() {
           return (
             <div key={block.block_key} style={{ background: "var(--bg-card)", border: "1px solid var(--line)", borderRadius: "var(--r-md)", padding: "14px 20px", display: "flex", alignItems: "center", gap: 14, opacity: block.visible ? 1 : 0.5 }}>
               <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                <button className="icon-btn" disabled={idx === 0} onClick={() => moveBlock(idx, -1)}><Icon name="chevronUp" size={16}/></button>
-                <button className="icon-btn" disabled={idx === blocks.length - 1} onClick={() => moveBlock(idx, 1)}><Icon name="chevronDown" size={16}/></button>
+                <button className="icon-btn" disabled={idx === 0} onClick={() => moveBlock(idx, -1)} style={{ background: "#1a2e1e", borderColor: "#1a2e1e", color: "#fff", opacity: idx === 0 ? 0.3 : 1 }}><Icon name="chevronUp" size={16}/></button>
+                <button className="icon-btn" disabled={idx === blocks.length - 1} onClick={() => moveBlock(idx, 1)} style={{ background: "#1a2e1e", borderColor: "#1a2e1e", color: "#fff", opacity: idx === blocks.length - 1 ? 0.3 : 1 }}><Icon name="chevronDown" size={16}/></button>
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontWeight: 600, fontSize: "0.95rem" }}>{meta.label}</div>

@@ -4,6 +4,7 @@ import Icon from '@/components/ui/Icon'
 import { createClient } from '@/lib/supabase-client'
 import HelpTip from '@/components/ui/HelpTip'
 import { GENERIC_BLOCKS, genericType } from '@/lib/generic-blocks'
+import SortableBlockList from '@/components/admin/SortableBlockList'
 
 const BLOCK_META = {
   header:        { label: 'En-tête de page',      desc: 'Accroche, titre, chapeau' },
@@ -71,6 +72,11 @@ export default function AdminAssoPageSection() {
     await supabase.from('asso_page_blocks').update({ ordre: current.ordre }).eq('id', target.id)
     load()
   }
+  const handleReorder = async (newBlocks) => {
+    const updates = newBlocks.map((b, i) => ({ id: b.id, ordre: (i + 1) * 10 }))
+    await Promise.all(updates.map(u => supabase.from('asso_page_blocks').update({ ordre: u.ordre }).eq('id', u.id)))
+    load()
+  }
   const deleteBlock = async (block) => {
     if (!confirm(`Supprimer le bloc "${BLOCK_META[block.block_key]?.label ?? block.block_key}" ?`)) return
     await supabase.from('asso_page_blocks').delete().eq('id', block.id)
@@ -102,14 +108,16 @@ export default function AdminAssoPageSection() {
           <Icon name="plus" size={13}/> Ajouter un bloc
         </button>
       </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        {blocks.map((block, idx) => {
+      <SortableBlockList
+        blocks={blocks}
+        onReorder={handleReorder}
+        renderBlock={(block, idx, total) => {
           const meta = BLOCK_META[block.block_key] ?? { label: block.block_key, desc: '' }
           return (
-            <div key={block.block_key} style={{ background: "var(--bg-card)", border: "1px solid var(--line)", borderRadius: "var(--r-md)", padding: "14px 20px", display: "flex", alignItems: "center", gap: 14, opacity: block.visible ? 1 : 0.5 }}>
+            <div style={{ background: "var(--bg-card)", border: "1px solid var(--line)", borderRadius: "var(--r-md)", padding: "14px 20px", display: "flex", alignItems: "center", gap: 14, opacity: block.visible ? 1 : 0.5 }}>
               <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
                 <button className="icon-btn" disabled={idx === 0} onClick={() => moveBlock(idx, -1)} style={{ background: "#1a2e1e", borderColor: "#1a2e1e", color: "#fff", opacity: idx === 0 ? 0.3 : 1 }}><Icon name="chevronUp" size={16}/></button>
-                <button className="icon-btn" disabled={idx === blocks.length - 1} onClick={() => moveBlock(idx, 1)} style={{ background: "#1a2e1e", borderColor: "#1a2e1e", color: "#fff", opacity: idx === blocks.length - 1 ? 0.3 : 1 }}><Icon name="chevronDown" size={16}/></button>
+                <button className="icon-btn" disabled={idx === total - 1} onClick={() => moveBlock(idx, 1)} style={{ background: "#1a2e1e", borderColor: "#1a2e1e", color: "#fff", opacity: idx === total - 1 ? 0.3 : 1 }}><Icon name="chevronDown" size={16}/></button>
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontWeight: 600, fontSize: "0.95rem" }}>{meta.label}</div>
@@ -123,8 +131,8 @@ export default function AdminAssoPageSection() {
               </div>
             </div>
           )
-        })}
-      </div>
+        }}
+      />
 
       {showCatalogue && (
         <Modal title="Ajouter un bloc" onClose={() => setShowCatalogue(false)}>

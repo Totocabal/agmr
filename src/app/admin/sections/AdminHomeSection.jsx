@@ -1,4 +1,5 @@
 'use client'
+import React from 'react'
 import { useState, useEffect } from 'react'
 import Icon from '@/components/ui/Icon'
 import { createClient } from '@/lib/supabase-client'
@@ -87,6 +88,12 @@ export default function AdminHomeSection() {
     load()
   }
 
+
+  const renameBlock = async (id, newLabel) => {
+    if (!newLabel.trim()) return
+    await supabase.from('home_blocks').update({ label: newLabel.trim() }).eq('id', id)
+    load()
+  }
   const handleReorder = async (newBlocks) => {
     const updates = newBlocks.map((b, i) => ({ id: b.id, ordre: (i + 1) * 10 }))
     await Promise.all(updates.map(u => supabase.from('home_blocks').update({ ordre: u.ordre }).eq('id', u.id)))
@@ -138,7 +145,7 @@ export default function AdminHomeSection() {
         blocks={blocks}
         onReorder={handleReorder}
         renderBlock={(block, idx, total) => {
-          const meta = BLOCK_META[block.block_key] ?? { label: block.block_key, desc: '' }
+          const meta = BLOCK_META[block.block_key] ?? { label: block.label ?? block.block_key, desc: '' }
           const hasPhoto = ['trio_gym','trio_rando','trio_nordique','manifesto'].includes(block.block_key)
           const hasContent = block.block_key !== 'actualites'
           const photoUrl = block.content?.photo_url

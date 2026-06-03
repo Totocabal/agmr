@@ -1,4 +1,5 @@
 'use client'
+import React from 'react'
 import { useState, useEffect } from 'react'
 import Icon from '@/components/ui/Icon'
 import { createClient } from '@/lib/supabase-client'
@@ -32,6 +33,38 @@ function Modal({ title, onClose, children }) {
 }
 
 // ── Main component ─────────────────────────────────────────────
+// ── InlineBlockLabel ─────────────────────────────────────────
+function InlineBlockLabel({ label, onSave }) {
+  const [editing, setEditing] = React.useState(false)
+  const [val, setVal] = React.useState(label)
+  React.useEffect(() => { setVal(label) }, [label])
+  if (editing) return (
+    <input
+      autoFocus
+      value={val}
+      onChange={e => setVal(e.target.value)}
+      onBlur={() => { onSave(val); setEditing(false) }}
+      onKeyDown={e => {
+        if (e.key === 'Enter') { onSave(val); setEditing(false) }
+        if (e.key === 'Escape') { setVal(label); setEditing(false) }
+      }}
+      style={{ fontWeight: 600, fontSize: "0.95rem", padding: "2px 6px", border: "1px solid var(--accent)", borderRadius: 4, fontFamily: "inherit", background: "var(--bg-card)", color: "var(--ink)", width: "100%" }}
+    />
+  )
+  return (
+    <div
+      style={{ fontWeight: 600, fontSize: "0.95rem", cursor: "text", display: "flex", alignItems: "center", gap: 6 }}
+      onClick={() => setEditing(true)}
+      title="Cliquer pour renommer"
+    >
+      {label}
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ opacity: 0.35, flexShrink: 0 }}>
+        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+      </svg>
+    </div>
+  )
+}
+
 export default function AdminRandoPageSection() {
   const [activeTab, setActiveTab]   = useState('blocs')
   const [blocks, setBlocks]         = useState([])
@@ -71,6 +104,12 @@ export default function AdminRandoPageSection() {
     if (!target) return
     await supabase.from('rando_page_blocks').update({ ordre: target.ordre }).eq('id', current.id)
     await supabase.from('rando_page_blocks').update({ ordre: current.ordre }).eq('id', target.id)
+    load()
+  }
+
+  const renameBlock = async (id, newLabel) => {
+    if (!newLabel.trim()) return
+    await supabase.from('rando_page_blocks').update({ label: newLabel.trim() }).eq('id', id)
     load()
   }
   const handleReorder = async (newBlocks) => {
@@ -154,7 +193,7 @@ export default function AdminRandoPageSection() {
             blocks={blocks}
             onReorder={handleReorder}
             renderBlock={(block, idx, total) => {
-              const meta = BLOCK_META[block.block_key] ?? { label: block.block_key, desc: '' }
+              const meta = BLOCK_META[block.block_key] ?? { label: block.label ?? block.block_key, desc: '' }
               return (
                 <div style={{ background: "var(--bg-card)", border: "1px solid var(--line)", borderRadius: "var(--r-md)", padding: "14px 20px", display: "flex", alignItems: "center", gap: 14, opacity: block.visible ? 1 : 0.5 }}>
                   <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
@@ -162,7 +201,7 @@ export default function AdminRandoPageSection() {
                     <button className="icon-btn" disabled={idx === total - 1} onClick={() => moveBlock(idx, 1)} style={{ background: "#1a2e1e", borderColor: "#1a2e1e", color: "#fff", opacity: idx === total - 1 ? 0.3 : 1 }}><Icon name="chevronDown" size={16}/></button>
                   </div>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 600, fontSize: "0.95rem" }}>{meta.label}</div>
+                    <InlineBlockLabel label={meta.label} onSave={lbl => renameBlock(block.id, lbl)} />
                     <div className="muted" style={{ fontSize: "0.82rem", marginTop: 2 }}>{meta.desc}</div>
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: 10 }}>

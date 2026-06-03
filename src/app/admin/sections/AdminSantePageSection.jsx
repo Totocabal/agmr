@@ -1,4 +1,5 @@
 'use client'
+import React from 'react'
 import { useState, useEffect } from 'react'
 import Icon from '@/components/ui/Icon'
 import { createClient } from '@/lib/supabase-client'
@@ -58,6 +59,12 @@ export default function AdminSantePageSection() {
     await supabase.from('sante_page_blocks').update({ ordre: current.ordre }).eq('id', target.id)
     load()
   }
+
+  const renameBlock = async (id, newLabel) => {
+    if (!newLabel.trim()) return
+    await supabase.from('sante_page_blocks').update({ label: newLabel.trim() }).eq('id', id)
+    load()
+  }
   const handleReorder = async (newBlocks) => {
     const updates = newBlocks.map((b, i) => ({ id: b.id, ordre: (i + 1) * 10 }))
     await Promise.all(updates.map(u => supabase.from('sante_page_blocks').update({ ordre: u.ordre }).eq('id', u.id)))
@@ -98,7 +105,7 @@ export default function AdminSantePageSection() {
         blocks={blocks}
         onReorder={handleReorder}
         renderBlock={(block, idx, total) => {
-          const meta = BLOCK_META[block.block_key] ?? { label: block.block_key, desc: '' }
+          const meta = BLOCK_META[block.block_key] ?? { label: block.label ?? block.block_key, desc: '' }
           return (
             <div style={{ background: "var(--bg-card)", border: "1px solid var(--line)", borderRadius: "var(--r-md)", padding: "14px 20px", display: "flex", alignItems: "center", gap: 14, opacity: block.visible ? 1 : 0.5 }}>
               <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>

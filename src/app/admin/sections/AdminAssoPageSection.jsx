@@ -47,6 +47,7 @@ export default function AdminAssoPageSection() {
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState(null)
   const [showCatalogue, setShowCatalogue] = useState(false)
+  const [pendingGeneric, setPendingGeneric] = useState(null)
   const supabase = createClient()
 
   const load = async () => {
@@ -82,9 +83,9 @@ export default function AdminAssoPageSection() {
     await supabase.from('asso_page_blocks').delete().eq('id', block.id)
     load()
   }
-  const addBlock = async (key) => {
+  const addBlock = async (key, customLabel) => {
     const maxOrdre = Math.max(0, ...blocks.map(b => b.ordre ?? 0))
-    await supabase.from('asso_page_blocks').insert({ block_key: key, label: (genericType(key) ? (GENERIC_BLOCKS.find(g => g.type === genericType(key))?.label ?? key) : (BLOCK_META[key]?.label ?? key)), visible: true, content: {}, ordre: maxOrdre + 10 })
+    await supabase.from('asso_page_blocks').insert({ block_key: key, label: customLabel || (genericType(key) ? (GENERIC_BLOCKS.find(g => g.type === genericType(key))?.label ?? key) : (BLOCK_META[key]?.label ?? key)), visible: true, content: {}, ordre: maxOrdre + 10 })
     setShowCatalogue(false)
     load()
   }
@@ -135,7 +136,7 @@ export default function AdminAssoPageSection() {
       />
 
       {showCatalogue && (
-        <Modal title="Ajouter un bloc" onClose={() => setShowCatalogue(false)}>
+        <Modal title="Ajouter un bloc" onClose={() => { setShowCatalogue(false); setPendingGeneric(null) }}>
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
               {catalogueItems.length > 0 && <>
                 <div style={{ fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--ink-mute)", marginBottom: 4 }}>Blocs de page</div>
@@ -149,10 +150,33 @@ export default function AdminAssoPageSection() {
               </>}
               <div style={{ fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--ink-mute)", marginBottom: 4 }}>Blocs réutilisables</div>
               {GENERIC_BLOCKS.map(g => (
-                <button key={g.type} onClick={() => addBlock(`${g.type}_${Date.now()}`)} style={{ background: "var(--bg-deep)", border: "1px solid var(--line)", borderRadius: "var(--r-md)", padding: "14px 18px", textAlign: "left", cursor: "pointer", display: "flex", flexDirection: "column", gap: 2 }}>
-                  <span style={{ fontWeight: 600 }}>{g.label}</span>
-                  <span style={{ fontSize: "0.82rem", color: "var(--ink-mute)" }}>{g.desc}</span>
-                </button>
+                pendingGeneric?.type === g.type ? (
+                  <div key={g.type} style={{ background: "var(--bg-deep)", border: "2px solid var(--accent)", borderRadius: "var(--r-md)", padding: "14px 18px", display: "flex", flexDirection: "column", gap: 10 }}>
+                    <span style={{ fontWeight: 600 }}>{g.label}</span>
+                    <input
+                      autoFocus
+                      value={pendingGeneric.label}
+                      onChange={e => setPendingGeneric(p => ({ ...p, label: e.target.value }))}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter' && pendingGeneric.label.trim()) { addBlock(`${g.type}_${Date.now()}`, pendingGeneric.label.trim()); setPendingGeneric(null) }
+                        if (e.key === 'Escape') setPendingGeneric(null)
+                      }}
+                      placeholder={`Nommer ce bloc (ex : ${g.label})`}
+                      style={{ padding: "8px 12px", border: "1px solid var(--line-strong)", borderRadius: "var(--r-sm)", fontFamily: "inherit", fontSize: "0.94rem", background: "var(--bg-card)", color: "var(--ink)", width: "100%" }}
+                    />
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <button className="btn btn-primary btn-sm" disabled={!pendingGeneric.label.trim()} onClick={() => { addBlock(`${g.type}_${Date.now()}`, pendingGeneric.label.trim()); setPendingGeneric(null) }}>
+                        Ajouter
+                      </button>
+                      <button className="btn btn-ghost btn-sm" onClick={() => setPendingGeneric(null)}>Annuler</button>
+                    </div>
+                  </div>
+                ) : (
+                  <button key={g.type} onClick={() => setPendingGeneric({ type: g.type, label: g.label })} style={{ background: "var(--bg-deep)", border: "1px solid var(--line)", borderRadius: "var(--r-md)", padding: "14px 18px", textAlign: "left", cursor: "pointer", display: "flex", flexDirection: "column", gap: 2 }}>
+                    <span style={{ fontWeight: 600 }}>{g.label}</span>
+                    <span style={{ fontSize: "0.82rem", color: "var(--ink-mute)" }}>{g.desc}</span>
+                  </button>
+                )
               ))}
             </div>
         </Modal>
